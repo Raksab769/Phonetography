@@ -18,9 +18,7 @@ if (savedUserName) {
   authButton.disabled = true;
 }
 
-function getVisionApiKey() {
-  return apiKeyInput.value.trim();
-}
+// Vision API removed: no getVisionApiKey function needed
 
 function initGoogleAuth() {
   if (window.google && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
@@ -174,9 +172,7 @@ gallery.addEventListener('click', event => {
   openLightbox(src, caption, description);
 });
 
-apiKeyInput.addEventListener('input', event => {
-  localStorage.setItem('visionApiKey', event.target.value.trim());
-});
+// Vision API removed: no apiKey input to listen for
 
 lightboxClose.addEventListener('click', closeLightbox);
 lightbox.addEventListener('click', event => {
