@@ -4,87 +4,57 @@ const lightboxImage = document.getElementById('lightbox-image');
 const lightboxCaption = document.getElementById('lightbox-caption');
 const lightboxClose = document.getElementById('lightbox-close');
 const fileInput = document.getElementById('file-input');
-const authButton = document.getElementById('auth-button');
-const userNameSpan = document.getElementById('user-name');
-
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
-let uploadedImages = [];
-
-const savedUserName = localStorage.getItem('googleUserName');
-if (savedUserName) {
-  userNameSpan.textContent = `Welcome, ${savedUserName.split(' ')[0]}!`;
-  authButton.textContent = 'Signed in';
-  authButton.classList.add('signed-in');
-  authButton.disabled = true;
-}
+const STORAGE_KEY = 'phonetography_saved_photos';
+const savedPhotos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
 // Vision API removed: no getVisionApiKey function needed
-
-function initGoogleAuth() {
-  if (window.google && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleAuthResponse
-    });
-  }
-}
-
-function handleAuthResponse(response) {
-  if (response.credential) {
-    const token = response.credential;
-    const decoded = JSON.parse(atob(token.split('.')[1]));
-    const userName = decoded.name || decoded.email;
-    
-    userNameSpan.textContent = `Welcome, ${userName.split(' ')[0]}!`;
-    authButton.textContent = 'Signed in';
-    authButton.classList.add('signed-in');
-    authButton.disabled = true;
-    
-    localStorage.setItem('googleToken', token);
-    localStorage.setItem('googleUserName', userName);
-  }
-}
-
-async function uploadToDrive(file) {
-  const token = localStorage.getItem('googleToken');
-  if (!token || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
-    return null;
-  }
-
-  try {
-    const metadata = {
-      name: file.name,
-      mimeType: file.type,
-      properties: { 'phonetography': 'true' }
-    };
-
-    const formData = new FormData();
-    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    formData.append('file', file);
-
-    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
-      body: formData
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    uploadedImages.push({ id: data.id, name: data.name, link: data.webViewLink });
-    localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
-    return data;
-  } catch (error) {
-    console.error('Drive upload error:', error);
-    return null;
-  }
-}
 
 function getImageDescription(fileName) {
   const name = fileName.replace(/\.[^.]+$/, '');
   return name || 'Uploaded image';
+}
+
+function savePhotosToStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(savedPhotos));
+}
+
+function generatePhotoId() {
+  return typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `photo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function deleteSavedPhoto(photoId) {
+  const index = savedPhotos.findIndex(photo => photo.id === photoId);
+  if (index !== -1) {
+    savedPhotos.splice(index, 1);
+    savePhotosToStorage();
+  }
+  const card = gallery.querySelector(`[data-id="${photoId}"]`);
+  if (card) {
+    card.remove();
+  }
+}
+
+function createDeleteButton(photoId) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'delete-photo';
+  button.textContent = 'Delete';
+  button.addEventListener('click', event => {
+    event.stopPropagation();
+    deleteSavedPhoto(photoId);
+  });
+  return button;
 }
 
 function openLightbox(src, caption, description = '') {
@@ -111,13 +81,17 @@ function closeLightbox() {
   document.body.style.overflow = '';
 }
 
-function addPhotoCard(src, caption, description = 'Uploaded image') {
+function addPhotoCard(src, caption, description = 'Uploaded image', options = {}) {
   const card = document.createElement('article');
   card.className = 'photo-card';
   card.title = 'Hover for details';
   card.dataset.src = src;
   card.dataset.caption = caption;
   card.dataset.description = description;
+
+  if (options.photoId) {
+    card.dataset.id = options.photoId;
+  }
 
   const img = document.createElement('img');
   img.src = src;
@@ -136,33 +110,43 @@ function addPhotoCard(src, caption, description = 'Uploaded image') {
 
   info.append(title, descriptionElement);
   card.append(img, info);
+
+  if (options.deletable && options.photoId) {
+    const deleteButton = createDeleteButton(options.photoId);
+    card.append(deleteButton);
+  }
+
   gallery.prepend(card);
   return card;
 }
 
-function handleFileUpload(event) {
+async function handleFileUpload(event) {
   const files = Array.from(event.target.files);
   if (files.length === 0) return;
 
-  files.forEach(async file => {
-    const url = URL.createObjectURL(file);
+  for (const file of files) {
+    const url = await readFileAsDataURL(file);
     const caption = file.name.replace(/\.[^.]+$/, '');
     const placeholder = 'Analyzing image...';
-    const card = addPhotoCard(url, caption, placeholder);
+    const photoId = generatePhotoId();
+    const card = addPhotoCard(url, caption, placeholder, { photoId, deletable: true });
     const description = await analyzeImage(file);
     updateCardDescription(card, description);
-    
-    // Upload to Google Drive if authenticated
-    const driveResult = await uploadToDrive(file);
-    if (driveResult) {
-      card.dataset.driveId = driveResult.id;
-    }
-  });
+
+    savedPhotos.unshift({
+      id: photoId,
+      src: url,
+      caption,
+      description
+    });
+    savePhotosToStorage();
+  }
 
   fileInput.value = '';
 }
 
 gallery.addEventListener('click', event => {
+  if (event.target.classList.contains('delete-photo')) return;
   const card = event.target.closest('.photo-card');
   if (!card) return;
 
@@ -189,25 +173,17 @@ document.addEventListener('keydown', event => {
 
 fileInput.addEventListener('change', handleFileUpload);
 
-authButton.addEventListener('click', () => {
-  if (authButton.classList.contains('signed-in')) {
-    localStorage.removeItem('googleToken');
-    localStorage.removeItem('googleUserName');
-    userNameSpan.textContent = '';
-    authButton.textContent = 'Sign in with Google';
-    authButton.classList.remove('signed-in');
-    authButton.disabled = false;
-  } else if (window.google && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
-    window.google.accounts.id.renderButton(authButton, {
-      theme: 'outline',
-      size: 'large'
-    });
-  } else {
-    alert('Please configure your Google Client ID in src/main.js');
-  }
-});
+function loadSavedPhotos() {
+  if (!Array.isArray(savedPhotos) || savedPhotos.length === 0) return;
 
-// Initialize Google Auth when page loads
+  savedPhotos.slice().reverse().forEach(photo => {
+    addPhotoCard(photo.src, photo.caption, photo.description, {
+      photoId: photo.id,
+      deletable: true
+    });
+  });
+}
+
 window.addEventListener('load', () => {
-  initGoogleAuth();
+  loadSavedPhotos();
 });

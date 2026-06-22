@@ -14,10 +14,6 @@
           <h1>Phonetography</h1>
           <p class="tagline">A mobile photography showcase</p>
         </div>
-        <div id="auth-container" class="auth-container">
-          <button id="auth-button" class="auth-button">Sign in with Google</button>
-          <span id="user-name" class="user-name"></span>
-        </div>
       </div>
     </div>
   </header>
@@ -30,19 +26,12 @@
     <section class="upload">
       <label class="upload-label" for="file-input">
         <span>Upload photos</span>
-        <input id="file-input" type="file" accept="image/*" multiple>
+        <input id="file-input" type="file" accept="image/*" capture="environment" multiple>
       </label>
       <p class="upload-help">Select images from your device to add them directly to the gallery.</p>
     </section>
 
     <section class="gallery" aria-label="Photo gallery">
-      <article class="photo-card" title="Hover for details" data-caption="Drive photo" data-description="A shared photo from Google Drive with rich detail." data-src="https://drive.google.com/uc?export=view&id=1MoSH935VtUgCKpt5OsripNYYdoCQHfel">
-        <img src="https://drive.google.com/uc?export=view&id=1MoSH935VtUgCKpt5OsripNYYdoCQHfel" alt="Photo from Google Drive">
-        <div class="photo-info">
-          <p class="photo-title">Drive photo</p>
-          <p class="photo-description">A shared photo from Google Drive with rich detail.</p>
-        </div>
-      </article>
       <article class="photo-card" data-caption="Urban street" data-description="Evening street scene captured with phone light and movement." data-src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80&auto=format&fit=crop">
         <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=80&auto=format&fit=crop" alt="Street mobile shot">
         <div class="photo-info">
@@ -87,7 +76,6 @@
     <p id="lightbox-caption"></p>
   </div>
 
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script type="module" src="src/main.js"></script>
 </body>
 </html>

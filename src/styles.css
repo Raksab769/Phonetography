@@ -187,6 +187,24 @@ body {
   transform: translateY(-6px);
 }
 
+.delete-photo {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text);
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  z-index: 2;
+}
+
+.delete-photo:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
 .photo-card img {
   width: 100%;
   display: block;
