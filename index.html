@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+ <cent><title>Phonetography</title></center> 
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>Phonetography</h1>
+      <p class="tagline">A mobile photography showcase</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <p>Explore a curated gallery of phone photographs with responsive layout and a lightbox preview.</p>
+    </section>
+
+    <section class="settings">
+      <label class="api-label" for="api-key-input">
+        <span>Google Vision API key</span>
+        <input id="api-key-input" type="text" placeholder="Enter API key">
+      </label>
+      <p class="upload-help">Paste your Vision API key here to automatically describe uploaded images.</p>
+    </section>
+
+    <section class="upload">
+      <label class="upload-label" for="file-input">
+        <span>Upload photos</span>
+        <input id="file-input" type="file" accept="image/*" multiple>
+      </label>
+      <p class="upload-help">Select images from your device to add them directly to the gallery.</p>
+    </section>
+
+    <section class="gallery" aria-label="Photo gallery">
+      <article class="photo-card" title="Hover for details" data-caption="Drive photo" data-description="A shared photo from Google Drive with rich detail." data-src="https://drive.google.com/uc?export=view&id=1MoSH935VtUgCKpt5OsripNYYdoCQHfel">
+        <img src="https://drive.google.com/uc?export=view&id=1MoSH935VtUgCKpt5OsripNYYdoCQHfel" alt="Photo from Google Drive">
+        <div class="photo-info">
+          <p class="photo-title">Drive photo</p>
+          <p class="photo-description">A shared photo from Google Drive with rich detail.</p>
+        </div>
+      </article>
+      <article class="photo-card" data-caption="Urban street" data-description="Evening street scene captured with phone light and movement." data-src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80&auto=format&fit=crop">
+        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=80&auto=format&fit=crop" alt="Street mobile shot">
+        <div class="photo-info">
+          <p class="photo-title">Urban street</p>
+          <p class="photo-description">Evening street scene captured with phone light and movement.</p>
+        </div>
+      </article>
+      <article class="photo-card" data-caption="Soft portrait" data-description="A close portrait showing soft phone-camera lighting and warm tones." data-src="https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=1200&q=80&auto=format&fit=crop">
+        <img src="https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=800&q=80&auto=format&fit=crop" alt="Portrait with phone">
+        <div class="photo-info">
+          <p class="photo-title">Soft portrait</p>
+          <p class="photo-description">A close portrait showing soft phone-camera lighting and warm tones.</p>
+        </div>
+      </article>
+      <article class="photo-card" data-caption="Misty morning" data-description="A misty morning landscape shot with deep mood and subtle contrast." data-src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80&auto=format&fit=crop">
+        <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80&auto=format&fit=crop" alt="Nature phone photo">
+        <div class="photo-info">
+          <p class="photo-title">Misty morning</p>
+          <p class="photo-description">A misty morning landscape shot with deep mood and subtle contrast.</p>
+        </div>
+      </article>
+      <article class="photo-card" data-caption="Abstract angle" data-description="A dramatic abstract composition with bold phone framing." data-src="https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?w=1200&q=80&auto=format&fit=crop">
+        <img src="https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?w=800&q=80&auto=format&fit=crop" alt="Abstract phone angle">
+        <div class="photo-info">
+          <p class="photo-title">Abstract angle</p>
+          <p class="photo-description">A dramatic abstract composition with bold phone framing.</p>
+        </div>
+      </article>
+      <article class="photo-card" data-caption="Night lights" data-description="A neon-lit nighttime capture with bright color accents." data-src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1200&q=80&auto=format&fit=crop">
+        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80&auto=format&fit=crop" alt="Night mobile shot">
+        <div class="photo-info">
+          <p class="photo-title">Night lights</p>
+          <p class="photo-description">A neon-lit nighttime capture with bright color accents.</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <button id="lightbox-close" class="lightbox-close" aria-label="Close lightbox">×</button>
+    <img id="lightbox-image" alt="Enlarged photo preview">
+    <p id="lightbox-caption"></p>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
