@@ -4,17 +4,11 @@ const lightboxImage = document.getElementById('lightbox-image');
 const lightboxCaption = document.getElementById('lightbox-caption');
 const lightboxClose = document.getElementById('lightbox-close');
 const fileInput = document.getElementById('file-input');
-const apiKeyInput = document.getElementById('api-key-input');
 const authButton = document.getElementById('auth-button');
 const userNameSpan = document.getElementById('user-name');
 
 const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
 let uploadedImages = [];
-
-const savedVisionKey = localStorage.getItem('visionApiKey');
-if (savedVisionKey) {
-  apiKeyInput.value = savedVisionKey;
-}
 
 const savedUserName = localStorage.getItem('googleUserName');
 if (savedUserName) {
@@ -90,20 +84,16 @@ async function uploadToDrive(file) {
   }
 }
 
+function getImageDescription(fileName) {
+  const name = fileName.replace(/\.[^.]+$/, '');
+  return name || 'Uploaded image';
+}
+
 function openLightbox(src, caption, description = '') {
   lightboxImage.src = src;
   lightboxCaption.textContent = description ? `${caption} — ${description}` : caption;
   lightbox.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-}
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
 }
 
 function updateCardDescription(card, description) {
@@ -115,52 +105,7 @@ function updateCardDescription(card, description) {
 }
 
 async function analyzeImage(file) {
-  const visionKey = getVisionApiKey();
-  if (!visionKey) {
-    return `Uploaded image file: ${file.name}`;
-  }
-
-  try {
-    const content = await fileToBase64(file);
-    const visionKey = getVisionApiKey();
-    const response = await fetch(
-      `https://vision.googleapis.com/v1/images:annotate?key=${visionKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          requests: [
-            {
-              image: { content },
-              features: [
-                { type: 'LABEL_DETECTION', maxResults: 6 },
-                { type: 'WEB_DETECTION', maxResults: 5 }
-              ]
-            }
-          ]
-        })
-      }
-    );
-
-    if (!response.ok) {
-      return `Uploaded image file: ${file.name}`;
-    }
-
-    const result = await response.json();
-    const annotation = result.responses?.[0];
-    const labels = annotation?.labelAnnotations?.map(item => item.description) ?? [];
-    const web = annotation?.webDetection?.webEntities?.map(item => item.description).filter(Boolean) ?? [];
-    const details = [];
-    if (labels.length) {
-      details.push(`Detected ${labels.slice(0, 4).join(', ')}`);
-    }
-    if (web.length) {
-      details.push(`Related to ${web.slice(0, 3).join(', ')}`);
-    }
-    return details.length ? details.join(' · ') : `Uploaded image file: ${file.name}`;
-  } catch {
-    return `Uploaded image file: ${file.name}`;
-  }
+  return getImageDescription(file.name);
 }
 
 function closeLightbox() {

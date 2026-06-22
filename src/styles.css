@@ -92,19 +92,16 @@ body {
   color: var(--muted);
 }
 
-.settings,
 .upload {
   display: grid;
   gap: 0.65rem;
   padding: 1.5rem 0 0;
 }
 
-.api-label,
 .upload-label {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  justify-content: center;
   min-height: 3rem;
   padding: 0 1.25rem;
   border-radius: 999px;
@@ -115,23 +112,7 @@ body {
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.api-label {
-  cursor: text;
-}
-
-.api-label input {
-  flex: 1;
-  margin-left: 1rem;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font: inherit;
-  outline: none;
-  min-width: 20ch;
-}
-
-.upload-label:hover,
-.api-label:hover {
+.upload-label:hover {
   transform: translateY(-1px);
   background: rgba(130, 199, 255, 0.18);
 }
