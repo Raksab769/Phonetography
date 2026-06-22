@@ -9,8 +9,16 @@
 <body>
   <header class="site-header">
     <div class="wrap">
-      <h1>Phonetography</h1>
-      <p class="tagline">A mobile photography showcase</p>
+      <div class="header-content">
+        <div>
+          <h1>Phonetography</h1>
+          <p class="tagline">A mobile photography showcase</p>
+        </div>
+        <div id="auth-container" class="auth-container">
+          <button id="auth-button" class="auth-button">Sign in with Google</button>
+          <span id="user-name" class="user-name"></span>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -87,6 +95,7 @@
     <p id="lightbox-caption"></p>
   </div>
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script type="module" src="src/main.js"></script>
 </body>
 </html>

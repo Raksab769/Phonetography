@@ -5,14 +5,89 @@ const lightboxCaption = document.getElementById('lightbox-caption');
 const lightboxClose = document.getElementById('lightbox-close');
 const fileInput = document.getElementById('file-input');
 const apiKeyInput = document.getElementById('api-key-input');
+const authButton = document.getElementById('auth-button');
+const userNameSpan = document.getElementById('user-name');
+
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+let uploadedImages = [];
 
 const savedVisionKey = localStorage.getItem('visionApiKey');
 if (savedVisionKey) {
   apiKeyInput.value = savedVisionKey;
 }
 
+const savedUserName = localStorage.getItem('googleUserName');
+if (savedUserName) {
+  userNameSpan.textContent = `Welcome, ${savedUserName.split(' ')[0]}!`;
+  authButton.textContent = 'Signed in';
+  authButton.classList.add('signed-in');
+  authButton.disabled = true;
+}
+
 function getVisionApiKey() {
   return apiKeyInput.value.trim();
+}
+
+function initGoogleAuth() {
+  if (window.google && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleAuthResponse
+    });
+  }
+}
+
+function handleAuthResponse(response) {
+  if (response.credential) {
+    const token = response.credential;
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    const userName = decoded.name || decoded.email;
+    
+    userNameSpan.textContent = `Welcome, ${userName.split(' ')[0]}!`;
+    authButton.textContent = 'Signed in';
+    authButton.classList.add('signed-in');
+    authButton.disabled = true;
+    
+    localStorage.setItem('googleToken', token);
+    localStorage.setItem('googleUserName', userName);
+  }
+}
+
+async function uploadToDrive(file) {
+  const token = localStorage.getItem('googleToken');
+  if (!token || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+    return null;
+  }
+
+  try {
+    const metadata = {
+      name: file.name,
+      mimeType: file.type,
+      properties: { 'phonetography': 'true' }
+    };
+
+    const formData = new FormData();
+    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    formData.append('file', file);
+
+    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    uploadedImages.push({ id: data.id, name: data.name, link: data.webViewLink });
+    localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
+    return data;
+  } catch (error) {
+    console.error('Drive upload error:', error);
+    return null;
+  }
 }
 
 function openLightbox(src, caption, description = '') {
@@ -133,6 +208,12 @@ function handleFileUpload(event) {
     const card = addPhotoCard(url, caption, placeholder);
     const description = await analyzeImage(file);
     updateCardDescription(card, description);
+    
+    // Upload to Google Drive if authenticated
+    const driveResult = await uploadToDrive(file);
+    if (driveResult) {
+      card.dataset.driveId = driveResult.id;
+    }
   });
 
   fileInput.value = '';
@@ -166,3 +247,26 @@ document.addEventListener('keydown', event => {
 });
 
 fileInput.addEventListener('change', handleFileUpload);
+
+authButton.addEventListener('click', () => {
+  if (authButton.classList.contains('signed-in')) {
+    localStorage.removeItem('googleToken');
+    localStorage.removeItem('googleUserName');
+    userNameSpan.textContent = '';
+    authButton.textContent = 'Sign in with Google';
+    authButton.classList.remove('signed-in');
+    authButton.disabled = false;
+  } else if (window.google && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+    window.google.accounts.id.renderButton(authButton, {
+      theme: 'outline',
+      size: 'large'
+    });
+  } else {
+    alert('Please configure your Google Client ID in src/main.js');
+  }
+});
+
+// Initialize Google Auth when page loads
+window.addEventListener('load', () => {
+  initGoogleAuth();
+});

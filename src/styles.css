@@ -30,10 +30,50 @@ body {
   padding: 2.5rem 0 1.5rem;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
 .site-header h1 {
   margin: 0;
   font-size: clamp(2.5rem, 4vw, 4rem);
   letter-spacing: -0.06em;
+}
+
+.auth-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.auth-button {
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+  background: rgba(130, 199, 255, 0.2);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.auth-button:hover {
+  background: rgba(130, 199, 255, 0.3);
+}
+
+.auth-button.signed-in {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.user-name {
+  color: var(--muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .tagline {
