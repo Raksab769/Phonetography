@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Mobile Photography Portfolio" />
+  <title>Phonetography</title>
+  <style>
+    /* ===== TOKENS ===== */
+    :root {
+      --bg:         #09090F;
+      --bg-2:       #0F0E1A;
+      --bg-3:       #161428;
+      --border:     #1E1C30;
+      --accent:     #C9A84C;
+      --accent-dim: #7A6428;
+      --text:       #EDE9E1;
+      --muted:      #5C587A;
+      --dim:        #2A2640;
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; overflow-x: hidden; }
+    img  { max-width: 100%; display: block; }
+    a    { text-decoration: none; color: inherit; }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
+    @keyframes slideUp { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
+    @keyframes spin    { to   { transform:rotate(360deg) } }
+    @keyframes focusIn { from { opacity:0; transform:translate(-50%,-50%) scale(1.2) } to { opacity:1; transform:translate(-50%,-50%) scale(1) } }
+    @keyframes metaUp  { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+    @keyframes pulse   { 0%,100% { opacity:1 } 50% { opacity:.45 } }
+
+    /* ===== LOADING ===== */
+    #loading-screen {
+      position:fixed; inset:0; z-index:1000;
+      background:var(--bg);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px;
+      transition:opacity .4s;
+    }
+    #loading-screen.hidden { opacity:0; pointer-events:none; }
+    .loader-logo  { font-family:Georgia,serif; font-size:22px; letter-spacing:.2em; color:var(--text); animation:pulse 2s ease infinite; }
+    .loader-ring  { width:32px; height:32px; border:2px solid var(--dim); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+    .loader-text  { font-size:12px; color:var(--muted); letter-spacing:.1em; }
+
+    /* ===== BUTTONS ===== */
+    .btn { padding:10px 20px; border-radius:2px; font-size:13px; font-weight:500; letter-spacing:.04em; cursor:pointer; border:none; transition:all .2s; white-space:nowrap; }
+    .btn--primary { background:var(--accent); color:#09090F; }
+    .btn--primary:hover { background:#D9B85A; }
+    .btn--ghost   { background:none; border:1px solid var(--border); color:var(--muted); }
+    .btn--ghost:hover { border-color:var(--accent-dim); color:var(--text); }
+    .btn--sm      { padding:7px 14px; font-size:12px; }
+    .btn--danger  { background:none; border:1px solid #EF4444; color:#EF4444; }
+    .btn--danger:hover { background:#EF4444; color:#fff; }
+
+    /* ===== SETUP MODAL ===== */
+    .modal-overlay { position:fixed; inset:0; z-index:900; background:rgba(9,9,15,.96); display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(8px); animation:fadeIn .3s ease; }
+    .modal-overlay.hidden { display:none; }
+    .setup-modal { background:var(--bg-2); border:1px solid var(--border); border-radius:8px; max-width:560px; width:100%; padding:40px; animation:slideUp .3s ease; max-height:90vh; overflow-y:auto; }
+    .setup-modal__icon  { font-size:32px; margin-bottom:16px; }
+    .setup-modal__title { font-family:Georgia,serif; font-size:24px; font-weight:400; margin-bottom:8px; }
+    .setup-modal__sub   { font-size:14px; color:var(--muted); margin-bottom:28px; line-height:1.7; }
+    .steps { display:flex; flex-direction:column; gap:12px; margin-bottom:28px; }
+    .step  { display:flex; gap:14px; align-items:flex-start; padding:14px; background:var(--bg-3); border:1px solid var(--border); border-radius:6px; }
+    .step__num { min-width:26px; height:26px; border:1px solid var(--accent-dim); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--accent); font-family:'Courier New',monospace; flex-shrink:0; }
+    .step__title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:3px; }
+    .step__desc  { font-size:12px; color:var(--muted); line-height:1.6; }
+    .step__link  { color:var(--accent); font-size:12px; display:inline-block; margin-top:4px; }
+    .step__link:hover { text-decoration:underline; }
+    .token-form  { display:flex; flex-direction:column; gap:10px; }
+    .token-form label { font-size:11px; letter-spacing:.08em; color:var(--muted); text-transform:uppercase; }
+    .token-input-wrap { display:flex; gap:8px; }
+    .token-input { flex:1; background:var(--bg-3); border:1px solid var(--border); border-radius:2px; padding:10px 14px; color:var(--text); font-family:'Courier New',monospace; font-size:12px; transition:border-color .2s; }
+    .token-input:focus { outline:none; border-color:var(--accent-dim); }
+    .token-input::placeholder { color:var(--muted); }
+
+    /* ===== BANNERS ===== */
+    #token-banner { background:rgba(245,158,11,.1); border-bottom:1px solid rgba(245,158,11,.25); padding:10px 40px; display:flex; align-items:center; gap:12px; font-size:13px; color:#F59E0B; }
+    #token-banner.hidden { display:none; }
+    #token-banner .banner-btn { margin-left:auto; padding:4px 12px; background:rgba(245,158,11,.15); border:1px solid rgba(245,158,11,.35); border-radius:2px; color:#F59E0B; font-size:11px; cursor:pointer; transition:all .2s; }
+    #token-banner .banner-btn:hover { background:rgba(245,158,11,.28); }
+    #error-banner { background:rgba(239,68,68,.1); border-bottom:1px solid rgba(239,68,68,.25); padding:10px 40px; display:flex; align-items:center; gap:12px; font-size:13px; color:#EF4444; }
+    #error-banner.hidden { display:none; }
+    #error-banner .banner-btn { margin-left:auto; padding:4px 12px; background:none; border:1px solid rgba(239,68,68,.35); border-radius:2px; color:#EF4444; font-size:11px; cursor:pointer; }
+
+    /* ===== NAV ===== */
+    .nav { position:sticky; top:0; z-index:50; background:#09090Fee; backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+    .nav__logo { font-family:Georgia,serif; font-size:17px; letter-spacing:.18em; color:var(--text); }
+    .nav__sub  { font-size:9px; letter-spacing:.4em; color:var(--accent-dim); text-transform:uppercase; margin-top:1px; }
+    .nav__right { display:flex; align-items:center; gap:20px; }
+    .nav__links { display:flex; gap:24px; }
+    .nav__link  { font-size:13px; color:var(--muted); letter-spacing:.04em; transition:color .2s; }
+    .nav__link:hover { color:var(--text); }
+    .nav__settings-btn { background:none; border:1px solid var(--dim); border-radius:2px; padding:6px 14px; color:var(--muted); font-size:12px; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all .2s; }
+    .nav__settings-btn:hover { border-color:var(--accent-dim); color:var(--text); }
+
+    /* ===== HERO ===== */
+    .hero { min-height:85vh; display:flex; align-items:center; padding:80px 40px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-30%; right:-5%; width:600px; height:600px; background:radial-gradient(circle, rgba(201,168,76,.07) 0%, transparent 70%); pointer-events:none; }
+    .hero__content { position:relative; z-index:1; max-width:780px; }
+    .hero__eyebrow { font-size:11px; letter-spacing:.35em; color:var(--accent); text-transform:uppercase; margin-bottom:24px; }
+    .hero__name    { font-family:Georgia,serif; font-size:clamp(44px,7vw,80px); font-weight:400; line-height:1.05; color:var(--text); margin-bottom:20px; }
+    .hero__tagline { font-size:17px; color:var(--muted); line-height:1.75; max-width:520px; margin-bottom:36px; }
+    .hero__actions { display:flex; gap:12px; flex-wrap:wrap; }
+    .hero__device  { position:absolute; right:40px; bottom:36px; font-size:11px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; font-family:'Courier New',monospace; }
+
+    /* ===== PROFILE STRIP ===== */
+    .profile-strip { border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:28px 40px; display:flex; align-items:center; gap:32px; flex-wrap:wrap; background:var(--bg-2); }
+    .profile__avatar { width:68px; height:68px; border-radius:50%; border:2px solid var(--accent-dim); object-fit:cover; flex-shrink:0; }
+    .profile__avatar-ph { width:68px; height:68px; border-radius:50%; border:2px solid var(--dim); background:var(--bg-3); display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+    .profile__info { flex:1; min-width:180px; }
+    .profile__name   { font-family:Georgia,serif; font-size:19px; font-weight:400; color:var(--text); margin-bottom:2px; }
+    .profile__handle { font-size:13px; color:var(--accent); margin-bottom:5px; }
+    .profile__bio    { font-size:13px; color:var(--muted); line-height:1.6; max-width:400px; }
+    .profile__stats  { display:flex; gap:32px; }
+    .stat { text-align:center; }
+    .stat__value { display:block; font-family:Georgia,serif; font-size:26px; color:var(--text); }
+    .stat__label { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+
+    /* ===== GALLERY ===== */
+    .gallery-section { padding:60px 40px 80px; }
+    .gallery-header  { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:16px; }
+    .gallery-title   { font-family:Georgia,serif; font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); }
+    .filter-bar { display:flex; gap:8px; flex-wrap:wrap; }
+    .filter-btn { padding:6px 14px; background:none; border:1px solid var(--dim); border-radius:2px; color:var(--muted); font-size:11px; letter-spacing:.05em; cursor:pointer; transition:all .2s; }
+    .filter-btn:hover  { border-color:var(--accent-dim); color:var(--text); }
+    .filter-btn.active { background:var(--accent); border-color:var(--accent); color:#09090F; font-weight:600; }
+    .gallery-grid   { column-count:3; column-gap:12px; }
+    .gallery-skeleton { column-count:3; column-gap:12px; }
+    .skeleton-card  { break-inside:avoid; margin-bottom:12px; border-radius:3px; background:var(--bg-2); border:1px solid var(--border); animation:pulse 1.8s ease infinite; }
+    .gallery-empty  { text-align:center; padding:60px 0; color:var(--muted); font-size:14px; }
+    .gallery-empty.hidden { display:none; }
+    .gallery-grid.hidden  { display:none; }
+    .load-more-wrap { text-align:center; margin-top:40px; }
+
+    /* ===== PHOTO CARD ===== */
+    .photo-card { display:block; break-inside:avoid; margin-bottom:12px; border-radius:3px; overflow:hidden; cursor:pointer; position:relative; }
+    .photo-card__wrap { position:relative; overflow:hidden; }
+    .photo-card__img  { width:100%; display:block; transition:filter .3s, transform .4s; }
+    .photo-card:hover .photo-card__img { filter:brightness(.75); transform:scale(1.02); }
+    .photo-card__ring { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:52px; height:52px; opacity:0; pointer-events:none; }
+    .photo-card:hover .photo-card__ring { animation:focusIn .2s ease forwards; }
+    .photo-card__corner { position:absolute; width:13px; height:13px; border-color:var(--accent); border-style:solid; }
+    .photo-card__corner--tl { top:0;    left:0;  border-width:2px 0 0 2px; }
+    .photo-card__corner--tr { top:0;    right:0; border-width:2px 2px 0 0; }
+    .photo-card__corner--bl { bottom:0; left:0;  border-width:0 0 2px 2px; }
+    .photo-card__corner--br { bottom:0; right:0; border-width:0 2px 2px 0; }
+    .photo-card__overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(9,9,15,.85) 0%, transparent 55%); opacity:0; transition:opacity .25s; }
+    .photo-card:hover .photo-card__overlay { opacity:1; }
+    .photo-card__meta    { position:absolute; bottom:0; left:0; right:0; padding:14px 12px; opacity:0; pointer-events:none; }
+    .photo-card:hover .photo-card__meta { animation:metaUp .22s ease .08s forwards; }
+    .photo-card__caption { font-size:11px; color:var(--text); line-height:1.5; margin-bottom:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .photo-card__date    { font-size:10px; color:rgba(255,255,255,.4); font-family:'Courier New',monospace; }
+    .photo-card__badge   { position:absolute; top:10px; right:10px; width:26px; height:26px; background:rgba(9,9,15,.7); border:1px solid rgba(255,255,255,.15); border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(255,255,255,.8); }
+
+    /* ===== ABOUT ===== */
+    .about-section { background:var(--bg-2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:80px 40px; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+    .about__eyebrow { font-size:11px; letter-spacing:.3em; color:var(--accent); text-transform:uppercase; margin-bottom:16px; }
+    .about__title   { font-family:Georgia,serif; font-size:clamp(28px,4vw,42px); font-weight:400; line-height:1.15; color:var(--text); margin-bottom:20px; }
+    .about__body    { font-size:15px; color:var(--muted); line-height:1.8; }
+    .about__body p + p { margin-top:14px; }
+    .gear-list  { display:flex; flex-direction:column; gap:10px; }
+    .gear-item  { padding:16px 20px; background:var(--bg-3); border:1px solid var(--border); border-radius:3px; }
+    .gear-item__label { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+    .gear-item__value { font-size:15px; color:var(--text); font-family:Georgia,serif; }
+
+    /* ===== FOOTER ===== */
+    footer { padding:28px 40px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+    .footer__logo  { font-family:Georgia,serif; font-size:13px; letter-spacing:.12em; color:var(--muted); }
+    .footer__links { display:flex; gap:20px; }
+    .footer__link  { font-size:12px; color:var(--muted); transition:color .2s; }
+    .footer__link:hover { color:var(--accent); }
+    .footer__copy  { font-size:11px; color:var(--dim); }
+
+    /* ===== SETTINGS PANEL ===== */
+    #settings-overlay { position:fixed; inset:0; z-index:199; background:rgba(9,9,15,.5); opacity:0; pointer-events:none; transition:opacity .3s; }
+    #settings-overlay.open { opacity:1; pointer-events:all; }
+    #settings-panel { position:fixed; top:0; right:-440px; width:420px; height:100vh; z-index:200; background:var(--bg-2); border-left:1px solid var(--border); padding:32px; overflow-y:auto; transition:right .3s ease; box-shadow:-20px 0 60px rgba(0,0,0,.4); }
+    #settings-panel.open { right:0; }
+    .s-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; }
+    .s-title  { font-family:Georgia,serif; font-size:20px; color:var(--text); }
+    .s-close  { background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; transition:color .2s; line-height:1; }
+    .s-close:hover { color:var(--text); }
+    .s-section { margin-bottom:28px; }
+    .s-section-lbl { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+    .s-row     { margin-bottom:12px; }
+    .s-row label { font-size:12px; color:var(--muted); display:block; margin-bottom:5px; }
+    .s-input   { width:100%; background:var(--bg-3); border:1px solid var(--border); border-radius:2px; padding:9px 12px; color:var(--text); font-size:12px; font-family:system-ui; transition:border-color .2s; }
+    .s-input:focus { outline:none; border-color:var(--accent-dim); }
+    .s-input.mono { font-family:'Courier New',monospace; }
+    .s-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .tok-status { padding:10px 12px; border-radius:3px; font-size:12px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    .tok-ok   { background:rgba(34,197,94,.1);  border:1px solid rgba(34,197,94,.25);  color:#4ADE80; }
+    .tok-warn { background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.25); color:#FCD34D; }
+    .tok-err  { background:rgba(239,68,68,.1);  border:1px solid rgba(239,68,68,.25);  color:#F87171; }
+    .tok-dot  { width:7px; height:7px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+    /* ===== UTILITIES ===== */
+    .hidden { display:none !important; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) { .gallery-grid, .gallery-skeleton { column-count:2; } }
+    @media (max-width: 768px) {
+      .nav { padding:0 20px; }
+      .nav__links { display:none; }
+      .hero { padding:60px 20px; min-height:72vh; }
+      .hero__device { display:none; }
+      .profile-strip { padding:20px; }
+      .gallery-section { padding:40px 20px 60px; }
+      .about-section { grid-template-columns:1fr; gap:40px; padding:60px 20px; }
+      footer { padding:24px 20px; }
+      #token-banner, #error-banner { padding:10px 20px; }
+      #settings-panel { width:100%; right:-100%; }
+      .setup-modal { padding:24px 20px; }
+    }
+    @media (max-width: 520px) {
+      .gallery-grid, .gallery-skeleton { column-count:1; }
+      .hero__name { font-size:38px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== LOADING ========== -->
+<div id="loading-screen">
+  <div class="loader-logo">PHONETOGRAPHY</div>
+  <div class="loader-ring"></div>
+  <div class="loader-text">Connecting to Instagram&hellip;</div>
+</div>
+
+<!-- ========== SETUP MODAL ========== -->
+<div id="setup-modal" class="modal-overlay hidden">
+  <div class="setup-modal">
+    <div class="setup-modal__icon">&#128247;</div>
+    <h2 class="setup-modal__title">Connect Your Instagram</h2>
+    <p class="setup-modal__sub">
+      Link your Instagram account once &mdash; your photos will automatically appear here
+      every time someone visits your site. No manual updates ever needed.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step__num">1</div>
+        <div>
+          <div class="step__title">Create a free Behold account</div>
+          <div class="step__desc">Go to behold.so and sign up free. No credit card needed.</div>
+          <a href="https://behold.so" target="_blank" rel="noopener" class="step__link">&rarr; Open Behold.so &#8599;</a>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num">2</div>
+        <div>
+          <div class="step__title">Connect your Instagram</div>
+          <div class="step__desc">In Behold &rarr; click <strong style="color:var(--text)">Add Source</strong> &rarr; choose <strong style="color:var(--text)">Basic</strong> &rarr; log in with Instagram. No developer account needed!</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num">3</div>
+        <div>
+          <div class="step__title">Create a Feed &amp; copy the Feed ID</div>
+          <div class="step__desc">In Behold &rarr; click <strong style="color:var(--text)">Add Feed</strong> &rarr; select your Instagram source &rarr; choose <strong style="color:var(--text)">JSON Feed</strong> &rarr; copy the <strong style="color:var(--text)">Feed ID</strong> (looks like: AbCd1234)</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num">4</div>
+        <div>
+          <div class="step__title">Paste the Feed ID below</div>
+          <div class="step__desc">That's it! Your photos will automatically appear on your website.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="token-form">
+      <label for="setup-token-input">Behold Feed ID</label>
+      <div class="token-input-wrap">
+        <input type="text" id="setup-token-input" class="token-input" placeholder="e.g. AbCd1234EfGh&hellip;" autocomplete="off" />
+        <button class="btn btn--primary" onclick="submitSetupToken()">Connect</button>
+      </div>
+      <div id="setup-error" style="font-size:12px;color:#F87171;margin-top:4px;display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SETTINGS OVERLAY + PANEL ========== -->
+<div id="settings-overlay" onclick="closeSettings()"></div>
+<div id="settings-panel">
+  <div class="s-header">
+    <h3 class="s-title">Settings</h3>
+    <button class="s-close" onclick="closeSettings()">&#10005;</button>
+  </div>
+
+  <div class="s-section">
+    <div class="s-section-lbl">Behold Feed ID</div>
+    <div id="tok-status" class="tok-status tok-ok"><div class="tok-dot"></div><span id="tok-status-text">Active</span></div>
+    <div class="s-row">
+      <label>New or replacement token</label>
+      <input type="text" id="s-token-input" class="s-input mono" placeholder="Paste Feed ID&hellip;" autocomplete="off" />
+    </div>
+    <div class="s-actions">
+      <button class="btn btn--primary btn--sm" onclick="saveNewToken()">Save Feed ID</button>
+      <button class="btn btn--danger  btn--sm" onclick="clearFeedId()">Disconnect</button>
+    </div>
+  </div>
+
+  <div class="s-section">
+    <div class="s-section-lbl">Page Identity</div>
+    <div class="s-row"><label>Your Name</label><input type="text"  id="s-name"    class="s-input" placeholder="e.g. Alex Carter" /></div>
+    <div class="s-row"><label>Tagline</label>   <input type="text"  id="s-tagline" class="s-input" placeholder="e.g. Capturing life through a phone lens" /></div>
+    <div class="s-row"><label>Primary Device</label><input type="text" id="s-device" class="s-input" placeholder="e.g. iPhone 15 Pro" /></div>
+    <div class="s-row"><label>About (shown in About section)</label><textarea id="s-about" class="s-input" rows="4" style="resize:vertical"></textarea></div>
+    <div class="s-row"><label>Instagram Handle (for links)</label><input type="text" id="s-handle" class="s-input" placeholder="@yourhandle" /></div>
+    <button class="btn btn--primary btn--sm" onclick="savePageSettings()">Save</button>
+  </div>
+
+  <div class="s-section">
+    <div class="s-section-lbl">Gear Showcase</div>
+    <div class="s-row"><label>Camera 1</label>    <input type="text" id="s-cam1"  class="s-input" placeholder="e.g. iPhone 15 Pro" /></div>
+    <div class="s-row"><label>Camera 2</label>    <input type="text" id="s-cam2"  class="s-input" placeholder="e.g. Pixel 8 Pro" /></div>
+    <div class="s-row"><label>Editing App</label> <input type="text" id="s-app"   class="s-input" placeholder="e.g. Lightroom Mobile" /></div>
+    <button class="btn btn--ghost btn--sm" onclick="saveGearSettings()">Save Gear</button>
+  </div>
+
+  <p style="font-size:11px;color:var(--muted);line-height:1.7;margin-top:8px;">
+    All settings are saved in your browser's localStorage.<br/>
+    Your access token never leaves your device.
+  </p>
+</div>
+
+<!-- ========== MAIN APP ========== -->
+<div id="app">
+
+  <!-- Banners -->
+  <div id="error-banner" class="hidden">
+    &#10060; <span id="err-banner-text">Could not load Instagram posts.</span>
+    <button class="banner-btn" onclick="retryLoad()">Retry</button>
+  </div>
+  <div id="file-proto-banner" class="hidden" style="background:rgba(239,68,68,.12);border-bottom:1px solid rgba(239,68,68,.3);padding:12px 40px;font-size:13px;color:#F87171;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    &#9888;&nbsp;<strong>Opened as file://</strong>&nbsp;&mdash; Instagram won't load until served over HTTP.&nbsp;
+    Open <strong>Terminal</strong> and run:&nbsp;
+    <code style="background:rgba(255,255,255,.08);padding:3px 10px;border-radius:3px;font-family:monospace;font-size:12px;color:#FCA5A5;">cd ~/Downloads/phonetography-website &amp;&amp; python3 -m http.server 8080</code>
+    &nbsp;then open&nbsp;<a href="http://localhost:8080" style="color:var(--accent);text-decoration:underline;font-weight:600;">localhost:8080</a>
+  </div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div>
+      <div class="nav__logo" id="nav-logo">PHONETOGRAPHY</div>
+      <div class="nav__sub">MOBILE PORTFOLIO</div>
+    </div>
+    <div class="nav__right">
+      <div class="nav__links">
+        <a href="#gallery" class="nav__link">Gallery</a>
+        <a href="#about"   class="nav__link">About</a>
+      </div>
+      <button class="nav__settings-btn" onclick="openSettings()">&#9881; Settings</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__content">
+      <div class="hero__eyebrow">&#9679; Mobile Photography Portfolio</div>
+      <h1 class="hero__name" id="hero-name">Your Name</h1>
+      <p class="hero__tagline" id="hero-tagline">Capturing the world through a phone lens &mdash; every frame, every moment, every story.</p>
+      <div class="hero__actions">
+        <a href="#gallery" class="btn btn--primary">View Gallery</a>
+        <a id="hero-ig-link" href="#" target="_blank" rel="noopener" class="btn btn--ghost">&#8599; Instagram</a>
+      </div>
+    </div>
+    <div class="hero__device" id="hero-device">iPhone 15 Pro</div>
+  </section>
+
+  <!-- Profile Strip -->
+  <div class="profile-strip" id="profile-section">
+    <div class="profile__avatar-ph">&#128247;</div>
+    <div class="profile__info">
+      <div class="profile__name" style="color:var(--muted)">Connecting to Instagram&hellip;</div>
+    </div>
+  </div>
+
+  <!-- Gallery -->
+  <section class="gallery-section" id="gallery">
+    <div class="gallery-header">
+      <span class="gallery-title">Latest from Instagram &mdash; auto&#8209;synced</span>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterPosts('ALL',this)">All</button>
+        <button class="filter-btn" onclick="filterPosts('IMAGE',this)">Photos</button>
+        <button class="filter-btn" onclick="filterPosts('VIDEO',this)">Videos</button>
+        <button class="filter-btn" onclick="filterPosts('CAROUSEL_ALBUM',this)">Carousels</button>
+      </div>
+    </div>
+
+    <!-- Skeleton -->
+    <div id="gallery-skeleton" class="gallery-skeleton">
+      <div class="skeleton-card" style="height:280px"></div>
+      <div class="skeleton-card" style="height:360px"></div>
+      <div class="skeleton-card" style="height:240px"></div>
+      <div class="skeleton-card" style="height:320px"></div>
+      <div class="skeleton-card" style="height:400px"></div>
+      <div class="skeleton-card" style="height:290px"></div>
+    </div>
+
+    <div id="gallery-grid"  class="gallery-grid hidden"></div>
+    <div id="gallery-empty" class="gallery-empty hidden">No posts found in this category.</div>
+    <div class="load-more-wrap">
+      <button id="load-more-btn" class="btn btn--ghost hidden" onclick="loadMore()">Load More</button>
+    </div>
+  </section>
+
+  <hr style="border:none;border-top:1px solid var(--border);" />
+
+  <!-- About -->
+  <section class="about-section" id="about">
+    <div>
+      <div class="about__eyebrow">About</div>
+      <h2 class="about__title" id="about-title">The phone<br/>is the camera.</h2>
+      <div class="about__body" id="about-body">
+        <p>I believe the best photograph is the one you actually take. Mobile photography has freed me from the weight of gear and the paralysis of perfection &mdash; letting me focus entirely on what matters: the light, the moment, the story.</p>
+        <p>Every image in this portfolio was captured on a smartphone, edited on a mobile app, and shared directly to Instagram &mdash; no desktop, no DSLR, no excuses.</p>
+      </div>
+    </div>
+    <div class="gear-list">
+      <div class="gear-item"><div class="gear-item__label">Primary Camera</div><div class="gear-item__value" id="gear-cam1">iPhone 15 Pro</div></div>
+      <div class="gear-item"><div class="gear-item__label">Secondary Camera</div><div class="gear-item__value" id="gear-cam2">Pixel 8 Pro</div></div>
+      <div class="gear-item"><div class="gear-item__label">Editing App</div><div class="gear-item__value" id="gear-app">Lightroom Mobile</div></div>
+      <div class="gear-item"><div class="gear-item__label">Follow on</div><div class="gear-item__value"><a id="gear-ig-link" href="#" target="_blank" rel="noopener" style="color:var(--accent)" id="gear-handle-el">Instagram &#8599;</a></div></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <span class="footer__logo" id="footer-name">PHONETOGRAPHY</span>
+    <div class="footer__links">
+      <a id="footer-ig" href="#" class="footer__link" target="_blank" rel="noopener">Instagram</a>
+      <a href="#gallery" class="footer__link">Gallery</a>
+      <a href="#about"   class="footer__link">About</a>
+    </div>
+    <span class="footer__copy">&copy; <span id="footer-year"></span></span>
+  </footer>
+
+</div><!-- /#app -->
+
+<script>
+  /* ======================================================
+     CONFIG — using Behold.so (no tokens, no expiry!)
+  ====================================================== */
+  var BEHOLD_API = 'https://feeds.behold.so';
+
+  /* ======================================================
+     STATE
+  ====================================================== */
+  var allPosts     = [];
+  var activeFilter = 'ALL';
+  var feedId       = null;
+
+  /* ======================================================
+     BOOT
+  ====================================================== */
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  async function init() {
+    feedId = localStorage.getItem('behold_feed_id');
+    loadPageSettings();
+    if (window.location.protocol === 'file:') {
+      hideLoading();
+      document.getElementById('file-proto-banner').classList.remove('hidden');
+      showSetupModal();
+      return;
+    }
+    if (!feedId) { hideLoading(); showSetupModal(); return; }
+    await loadAll();
+  }
+
+  /* ======================================================
+     API — one simple fetch, no auth needed
+  ====================================================== */
+  async function fetchFeed(id) {
+    var ctrl = new AbortController();
+    var tid  = setTimeout(function(){ ctrl.abort(); }, 8000);
+    try {
+      var res = await fetch(BEHOLD_API + '/' + id, { signal: ctrl.signal });
+      clearTimeout(tid);
+      if (!res.ok) throw new Error('Feed not found. Check your Feed ID.');
+      return await res.json();
+    } catch(e) {
+      clearTimeout(tid);
+      if (e.name === 'AbortError') throw new Error('Connection timed out. Make sure you are serving over HTTP.');
+      throw e;
+    }
+  }
+
+  async function loadAll() {
+    showLoading();
+    hideError();
+    try {
+      var posts = await fetchFeed(feedId);
+      allPosts  = Array.isArray(posts) ? posts : (posts.posts || []);
+      renderProfile();
+      renderGallery();
+    } catch(err) {
+      showError(err.message);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  async function retryLoad() { hideError(); await loadAll(); }
+
+  /* ======================================================
+     RENDER: PROFILE (from post data)
+  ====================================================== */
+  function renderProfile() {
+    var el  = document.getElementById('profile-section');
+    var usr = allPosts.length > 0 ? (allPosts[0].username || '') : '';
+    var s   = JSON.parse(localStorage.getItem('page_settings') || '{}');
+    var name = s.name || usr || 'Phonetography';
+    el.innerHTML = '<div class="profile__avatar-ph">&#128247;</div>'
+      + '<div class="profile__info">'
+      +   '<div class="profile__name">' + name + '</div>'
+      + (usr ? '<div class="profile__handle">@' + usr + '</div>' : '')
+      + '</div>'
+      + '<div class="profile__stats">'
+      +   '<div class="stat"><span class="stat__value">' + allPosts.length + '+</span><span class="stat__label">Posts</span></div>'
+      + '</div>';
+    if (usr) updateIgLinks('https://instagram.com/' + usr);
+  }
+
+  /* ======================================================
+     RENDER: GALLERY — Behold uses camelCase field names
+  ====================================================== */
+  function renderGallery() {
+    var grid  = document.getElementById('gallery-grid');
+    var empty = document.getElementById('gallery-empty');
+    var btn   = document.getElementById('load-more-btn');
+    var skel  = document.getElementById('gallery-skeleton');
+    if (skel) skel.style.display = 'none';
+
+    var posts = activeFilter === 'ALL' ? allPosts
+      : allPosts.filter(function(p){ return p.mediaType === activeFilter; });
+
+    if (posts.length === 0) {
+      grid.classList.add('hidden'); empty.classList.remove('hidden');
+      btn.classList.add('hidden'); return;
+    }
+    empty.classList.add('hidden'); grid.classList.remove('hidden');
+    btn.classList.add('hidden');
+
+    grid.innerHTML = posts.map(function(post) {
+      var src  = post.mediaType === 'VIDEO' ? (post.thumbnailUrl || post.mediaUrl || '') : (post.mediaUrl || '');
+      var cap  = (post.caption || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      var scap = cap.length > 120 ? cap.slice(0, 117) + '…' : cap;
+      var d    = post.timestamp
+        ? new Date(post.timestamp).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+        : '';
+      var isV  = post.mediaType === 'VIDEO';
+      var isC  = post.mediaType === 'CAROUSEL_ALBUM';
+      return '<a href="' + (post.permalink || '#') + '" target="_blank" rel="noopener" class="photo-card">'
+        + '<div class="photo-card__wrap">'
+        + (src ? '<img src="' + src + '" alt="' + (scap || 'Instagram photo') + '" class="photo-card__img" loading="lazy" />' : '')
+        + (isV ? '<div class="photo-card__badge">&#9654;</div>' : '')
+        + (isC ? '<div class="photo-card__badge">&#10753;</div>' : '')
+        + '<div class="photo-card__ring">'
+        +   '<div class="photo-card__corner photo-card__corner--tl"></div>'
+        +   '<div class="photo-card__corner photo-card__corner--tr"></div>'
+        +   '<div class="photo-card__corner photo-card__corner--bl"></div>'
+        +   '<div class="photo-card__corner photo-card__corner--br"></div>'
+        + '</div>'
+        + '<div class="photo-card__overlay"></div>'
+        + '<div class="photo-card__meta">'
+        + (scap ? '<p class="photo-card__caption">' + scap + '</p>' : '')
+        + (d    ? '<span class="photo-card__date">'  + d   + '</span>' : '')
+        + '</div></div></a>';
+    }).join('');
+  }
+
+  function filterPosts(type, btn) {
+    activeFilter = type;
+    document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    renderGallery();
+  }
+
+  /* ======================================================
+     FEED ID MANAGEMENT (replaces token management)
+  ====================================================== */
+  function saveFeedId(id) {
+    feedId = id.trim();
+    localStorage.setItem('behold_feed_id', feedId);
+  }
+
+  function clearFeedId() {
+    if (!confirm('Disconnect Behold feed?')) return;
+    localStorage.removeItem('behold_feed_id');
+    feedId = null;
+    closeSettings();
+    location.reload();
+  }
+
+  /* ======================================================
+     SETUP MODAL
+  ====================================================== */
+  function showSetupModal() { document.getElementById('setup-modal').classList.remove('hidden'); }
+  function hideSetupModal() { document.getElementById('setup-modal').classList.add('hidden'); }
+
+  async function submitSetupToken() {
+    var input = document.getElementById('setup-token-input');
+    var errEl = document.getElementById('setup-error');
+    var id    = input.value.trim();
+    if (!id) { errEl.textContent = 'Please paste your Behold Feed ID.'; errEl.style.display = 'block'; return; }
+    errEl.style.display = 'none';
+    input.disabled = true;
+    try {
+      var posts = await fetchFeed(id);
+      if (!Array.isArray(posts) && !posts.posts) throw new Error('Invalid Feed ID.');
+      saveFeedId(id);
+      hideSetupModal();
+      await loadAll();
+    } catch(e) {
+      errEl.textContent = 'Could not load feed: ' + e.message;
+      errEl.style.display = 'block';
+      input.disabled = false;
+    }
+  }
+
+  /* ======================================================
+     SETTINGS PANEL
+  ====================================================== */
+  function openSettings() {
+    document.getElementById('settings-panel').classList.add('open');
+    document.getElementById('settings-overlay').classList.add('open');
+    loadSettingsInputs();
+  }
+  function closeSettings() {
+    document.getElementById('settings-panel').classList.remove('open');
+    document.getElementById('settings-overlay').classList.remove('open');
+  }
+
+  function saveNewToken() {
+    var val = document.getElementById('s-token-input').value.trim();
+    if (!val) { alert('Please paste a Feed ID.'); return; }
+    saveFeedId(val);
+    document.getElementById('s-token-input').value = '';
+    alert('Feed ID saved. Reloading…');
+    loadAll();
+  }
+
+  function savePageSettings() {
+    var s = {
+      name:    document.getElementById('s-name').value,
+      tagline: document.getElementById('s-tagline').value,
+      device:  document.getElementById('s-device').value,
+      about:   document.getElementById('s-about').value,
+      handle:  document.getElementById('s-handle').value
+    };
+    localStorage.setItem('page_settings', JSON.stringify(s));
+    loadPageSettings();
+    alert('Saved!');
+  }
+
+  function saveGearSettings() {
+    var g = {
+      cam1: document.getElementById('s-cam1').value,
+      cam2: document.getElementById('s-cam2').value,
+      app:  document.getElementById('s-app').value
+    };
+    localStorage.setItem('page_gear', JSON.stringify(g));
+    loadPageSettings();
+    alert('Gear saved!');
+  }
+
+  function loadSettingsInputs() {
+    var s = JSON.parse(localStorage.getItem('page_settings') || '{}');
+    var g = JSON.parse(localStorage.getItem('page_gear')     || '{}');
+    document.getElementById('s-name').value    = s.name    || '';
+    document.getElementById('s-tagline').value = s.tagline || '';
+    document.getElementById('s-device').value  = s.device  || '';
+    document.getElementById('s-about').value   = s.about   || '';
+    document.getElementById('s-handle').value  = s.handle  || '';
+    document.getElementById('s-cam1').value    = g.cam1    || '';
+    document.getElementById('s-cam2').value    = g.cam2    || '';
+    document.getElementById('s-app').value     = g.app     || '';
+    var fid = localStorage.getItem('behold_feed_id') || '';
+    var si  = document.getElementById('s-token-input');
+    if (si) si.placeholder = fid ? 'Current: ' + fid.slice(0,8) + '...' : 'Paste Feed ID...';
+    var ts  = document.getElementById('tok-status');
+    var tt  = document.getElementById('tok-status-text');
+    if (ts && tt) {
+      ts.className = fid ? 'tok-status tok-ok' : 'tok-status tok-err';
+      tt.textContent = fid ? 'Feed connected (' + fid.slice(0,8) + '...)' : 'No feed connected';
+    }
+  }
+
+  function loadPageSettings() {
+    var s = JSON.parse(localStorage.getItem('page_settings') || '{}');
+    var g = JSON.parse(localStorage.getItem('page_gear')     || '{}');
+    if (s.name)    { document.getElementById('hero-name').textContent  = s.name; document.getElementById('nav-logo').textContent = s.name.toUpperCase(); document.getElementById('footer-name').textContent = s.name.toUpperCase(); }
+    if (s.tagline) document.getElementById('hero-tagline').textContent = s.tagline;
+    if (s.device)  document.getElementById('hero-device').textContent  = s.device;
+    if (s.about)   document.getElementById('about-body').innerHTML     = '<p>' + s.about + '</p>';
+    if (s.handle) {
+      var url = 'https://instagram.com/' + s.handle.replace('@','');
+      updateIgLinks(url);
+      document.getElementById('gear-handle-el').textContent = s.handle + ' ↗';
+    }
+    if (g.cam1) document.getElementById('gear-cam1').textContent = g.cam1;
+    if (g.cam2) document.getElementById('gear-cam2').textContent = g.cam2;
+    if (g.app)  document.getElementById('gear-app').textContent  = g.app;
+  }
+
+  function updateIgLinks(url) {
+    document.getElementById('hero-ig-link').href = url;
+    document.getElementById('footer-ig').href    = url;
+    document.getElementById('gear-ig-link').href = url;
+  }
+
+  /* ======================================================
+     UI HELPERS
+  ====================================================== */
+  function showLoading() { document.getElementById('loading-screen').classList.remove('hidden'); }
+  function hideLoading() {
+    var ls = document.getElementById('loading-screen');
+    ls.style.opacity = '0';
+    setTimeout(function(){ ls.classList.add('hidden'); }, 400);
+  }
+  function showError(msg) {
+    document.getElementById('error-banner').classList.remove('hidden');
+    document.getElementById('err-banner-text').textContent = msg || 'Could not load posts.';
+  }
+  function hideError() { document.getElementById('error-banner').classList.add('hidden'); }
+
+  /* ======================================================
+     KEYBOARD
+  ====================================================== */
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSettings(); });
+  document.getElementById('setup-token-input').addEventListener('keydown', function(e){ if (e.key === 'Enter') submitSetupToken(); });
+
+  /* ======================================================
+     START
+  ====================================================== */
+  init();
+</script>
+</body>
+</html>
