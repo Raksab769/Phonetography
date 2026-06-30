@@ -449,6 +449,7 @@
      CONFIG — using Behold.so (no tokens, no expiry!)
   ====================================================== */
   var BEHOLD_API = 'https://feeds.behold.so';
+  var DEFAULT_BEHOLD_FEED_ID = 'kgQz4lZehF0dG9ESw0D8d8Wj';
 
   /* ======================================================
      STATE
@@ -464,22 +465,21 @@
 
   async function init() {
     var savedFeedId = localStorage.getItem('behold_feed_id');
-    if (savedFeedId) {
-      feedId = savedFeedId;
-      localStorage.setItem('behold_feed_id', savedFeedId);
+    if (savedFeedId && savedFeedId.trim()) {
+      feedId = savedFeedId.trim();
     } else {
-      feedId = 'kgQz4lZehF0dG9ESw0D8d8Wj';
+      feedId = DEFAULT_BEHOLD_FEED_ID;
       localStorage.setItem('behold_feed_id', feedId);
     }
 
     loadPageSettings();
+    hideSetupModal();
+
     if (window.location.protocol === 'file:') {
       hideLoading();
       document.getElementById('file-proto-banner').classList.remove('hidden');
-      return;
     }
 
-    hideSetupModal();
     await loadAll();
   }
 
