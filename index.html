@@ -137,10 +137,11 @@
     .load-more-wrap { text-align:center; margin-top:40px; }
 
     /* ===== PHOTO CARD ===== */
-    .photo-card { display:block; break-inside:avoid; margin-bottom:12px; border-radius:3px; overflow:hidden; cursor:pointer; position:relative; }
-    .photo-card__wrap { position:relative; overflow:hidden; }
-    .photo-card__img  { width:100%; display:block; transition:filter .3s, transform .4s; }
-    .photo-card:hover .photo-card__img { filter:brightness(.75); transform:scale(1.02); }
+    .photo-card { display:block; break-inside:avoid; margin-bottom:12px; border-radius:3px; overflow:hidden; cursor:pointer; position:relative; perspective:900px; }
+    .photo-card__wrap { position:relative; overflow:hidden; transform-style:preserve-3d; }
+    .photo-card__img  { width:100%; display:block; transition:filter .25s ease, transform .25s ease; transform-origin:center; will-change:transform, filter; }
+    .photo-card:hover .photo-card__img,
+    .photo-card.is-hovered .photo-card__img { filter:brightness(.8); transform:scale(1.03); }
     .photo-card__ring { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:52px; height:52px; opacity:0; pointer-events:none; }
     .photo-card:hover .photo-card__ring { animation:focusIn .2s ease forwards; }
     .photo-card__corner { position:absolute; width:13px; height:13px; border-color:var(--accent); border-style:solid; }
@@ -531,6 +532,34 @@
   /* ======================================================
      RENDER: GALLERY — Behold uses camelCase field names
   ====================================================== */
+  function bindPhotoCardInteractions() {
+    document.querySelectorAll('.photo-card').forEach(function(card) {
+      var img = card.querySelector('.photo-card__img');
+      if (!img) return;
+
+      card.addEventListener('pointerenter', function() {
+        card.classList.add('is-hovered');
+      });
+
+      card.addEventListener('pointermove', function(event) {
+        var rect = card.getBoundingClientRect();
+        var x = (event.clientX - rect.left) / rect.width;
+        var y = (event.clientY - rect.top) / rect.height;
+        var rotateY = (x - 0.5) * 10;
+        var rotateX = (0.5 - y) * 8;
+
+        img.style.transform = 'perspective(900px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg) scale(1.04)';
+        img.style.filter = 'brightness(0.82) saturate(1.08)';
+      });
+
+      card.addEventListener('pointerleave', function() {
+        card.classList.remove('is-hovered');
+        img.style.transform = '';
+        img.style.filter = '';
+      });
+    });
+  }
+
   function renderGallery() {
     var grid  = document.getElementById('gallery-grid');
     var empty = document.getElementById('gallery-empty');
@@ -574,6 +603,8 @@
         + (d    ? '<span class="photo-card__date">'  + d   + '</span>' : '')
         + '</div></div></a>';
     }).join('');
+
+    bindPhotoCardInteractions();
   }
 
   function filterPosts(type, btn) {
