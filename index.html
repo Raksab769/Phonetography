@@ -482,16 +482,20 @@
     }
 
     await loadAll();
+    window.addEventListener('focus', function() { if (feedId) loadAll(); });
+    setInterval(function() { if (feedId) loadAll(); }, 300000);
   }
 
   /* ======================================================
      API — one simple fetch, no auth needed
   ====================================================== */
   async function fetchFeed(id) {
+    if (!id) return [];
     var ctrl = new AbortController();
     var tid  = setTimeout(function(){ ctrl.abort(); }, 8000);
     try {
-      var res = await fetch(BEHOLD_API + '/' + id, { signal: ctrl.signal });
+      var url = BEHOLD_API + '/' + id + '?t=' + Date.now();
+      var res = await fetch(url, { signal: ctrl.signal, cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } });
       clearTimeout(tid);
       if (!res.ok) throw new Error('Feed not found. Check your Feed ID.');
       return await res.json();
@@ -506,8 +510,8 @@
     showLoading();
     hideError();
     try {
-      var posts = await fetchFeed(feedId);
-      allPosts  = Array.isArray(posts) ? posts : (posts.posts || []);
+      var payload = await fetchFeed(feedId);
+      allPosts = Array.isArray(payload) ? payload : (payload.posts || payload.items || payload.data || payload.media || []);
       renderProfile();
       renderGallery();
     } catch(err) {
