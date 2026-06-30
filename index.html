@@ -463,15 +463,23 @@
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
   async function init() {
-    feedId = localStorage.getItem('behold_feed_id');
+    var savedFeedId = localStorage.getItem('behold_feed_id');
+    if (savedFeedId) {
+      feedId = savedFeedId;
+      localStorage.setItem('behold_feed_id', savedFeedId);
+    } else {
+      feedId = 'kgQz4lZehF0dG9ESw0D8d8Wj';
+      localStorage.setItem('behold_feed_id', feedId);
+    }
+
     loadPageSettings();
     if (window.location.protocol === 'file:') {
       hideLoading();
       document.getElementById('file-proto-banner').classList.remove('hidden');
-      showSetupModal();
       return;
     }
-    if (!feedId) { hideLoading(); showSetupModal(); return; }
+
+    hideSetupModal();
     await loadAll();
   }
 
@@ -620,6 +628,7 @@
   function saveFeedId(id) {
     feedId = id.trim();
     localStorage.setItem('behold_feed_id', feedId);
+    hideSetupModal();
   }
 
   function clearFeedId() {
