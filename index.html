@@ -1219,7 +1219,28 @@
       const portfolioGrid = document.getElementById('main-portfolio-grid');
       const lightboxesContainer = document.getElementById('dynamic-lightboxes');
 
-      // Modal Toggles
+      // 5-Minute Inactivity Auto-Logout Tracker
+      let inactivityTimer = null;
+      const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+      function resetInactivityTimer() {
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        if (auth.currentUser) {
+          inactivityTimer = setTimeout(() => {
+            auth.signOut().then(() => {
+              alert("You have been automatically logged out due to 5 minutes of inactivity.");
+            });
+          }, INACTIVITY_TIMEOUT);
+        }
+      }
+
+      // User interaction events to reset timer
+      const userActivityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+      userActivityEvents.forEach(evt => {
+        window.addEventListener(evt, resetInactivityTimer, { passive: true });
+      });
+
+      // Modal Controls
       const openModal = () => authModal.classList.add('active');
       const closeModal = () => authModal.classList.remove('active');
       
@@ -1241,7 +1262,7 @@
 
       authModalClose.addEventListener('click', closeModal);
 
-      // Login Handler
+      // Handle Sign-In
       loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('auth-email').value.trim();
@@ -1262,18 +1283,20 @@
           });
       });
 
-      // Strict Owner Visibility Control
+      // Auth State Manager
       auth.onAuthStateChanged((user) => {
         if (user) {
           authNavBtn.textContent = 'Sign Out';
           authMobileBtn.textContent = 'Sign Out';
           uploadSection.style.display = 'block';
           document.querySelectorAll('.btn-delete-card').forEach(btn => btn.style.display = 'block');
+          resetInactivityTimer();
         } else {
           authNavBtn.textContent = 'Owner Login';
           authMobileBtn.textContent = 'Owner Login';
           uploadSection.style.display = 'none';
           document.querySelectorAll('.btn-delete-card').forEach(btn => btn.style.display = 'none');
+          if (inactivityTimer) clearTimeout(inactivityTimer);
         }
       });
 
