@@ -918,7 +918,8 @@
 
       <!-- Portfolio Grid -->
       <div class="portfolio-grid" id="main-portfolio-grid">
-        <div class="p-card p-card-1">
+        <div class="p-card p-card-1 static-card" id="card-static-1">
+          <button class="btn-delete-card" title="Remove Photo" onclick="deleteStaticPhoto('static-1')">Remove</button>
           <img alt="Butterfly - Tiger Shark" src="images/df873ac3-d632-4b4a-b9e7-c7387caa13a4.jpg">
           <a class="preview-btn" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(0,0,0,0.6);color:#fff;font-size:0.7rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;padding:0.45rem 0.9rem;border:1px solid rgba(255,255,255,0.3);opacity:0;transition:opacity 0.2s;" href="#lb-1">Preview</a>
           <div class="p-card-caption">
@@ -927,7 +928,8 @@
           </div>
         </div>
 
-        <div class="p-card p-card-2">
+        <div class="p-card p-card-2 static-card" id="card-static-2">
+          <button class="btn-delete-card" title="Remove Photo" onclick="deleteStaticPhoto('static-2')">Remove</button>
           <img alt="Couple Birds" src="images/0533b508-74cc-4541-890a-5bca0080fca9.jpg">
           <a class="preview-btn" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(0,0,0,0.6);color:#fff;font-size:0.7rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;padding:0.45rem 0.9rem;border:1px solid rgba(255,255,255,0.3);opacity:0;transition:opacity 0.2s;" href="#lb-2">Preview</a>
           <div class="p-card-caption">
@@ -936,7 +938,8 @@
           </div>
         </div>
 
-        <div class="p-card p-card-3">
+        <div class="p-card p-card-3 static-card" id="card-static-3">
+          <button class="btn-delete-card" title="Remove Photo" onclick="deleteStaticPhoto('static-3')">Remove</button>
           <img alt="Bugs" src="images/bd998f52-2f75-4ce4-acde-6dd081357275.jpg">
           <a class="preview-btn" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(0,0,0,0.6);color:#fff;font-size:0.7rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;padding:0.45rem 0.9rem;border:1px solid rgba(255,255,255,0.3);opacity:0;transition:opacity 0.2s;" href="#lb-3">Preview</a>
           <div class="p-card-caption">
@@ -945,7 +948,8 @@
           </div>
         </div>
 
-        <div class="p-card p-card-4">
+        <div class="p-card p-card-4 static-card" id="card-static-4">
+          <button class="btn-delete-card" title="Remove Photo" onclick="deleteStaticPhoto('static-4')">Remove</button>
           <img alt="Flower" src="images/b8de864a-fa02-4e6b-85e8-55ba500fdbc6.jpg">
           <a class="preview-btn" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(0,0,0,0.6);color:#fff;font-size:0.7rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;padding:0.45rem 0.9rem;border:1px solid rgba(255,255,255,0.3);opacity:0;transition:opacity 0.2s;" href="#lb-4">Preview</a>
           <div class="p-card-caption">
@@ -954,7 +958,8 @@
           </div>
         </div>
 
-        <div class="p-card p-card-5">
+        <div class="p-card p-card-5 static-card" id="card-static-5">
+          <button class="btn-delete-card" title="Remove Photo" onclick="deleteStaticPhoto('static-5')">Remove</button>
           <img alt="Gateway" src="images/19a1dd6a-a900-41cf-b2a9-a1bfe19cf322.jpg">
           <a class="preview-btn" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(0,0,0,0.6);color:#fff;font-size:0.7rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;padding:0.45rem 0.9rem;border:1px solid rgba(255,255,255,0.3);opacity:0;transition:opacity 0.2s;" href="#lb-5">Preview</a>
           <div class="p-card-caption">
@@ -1202,6 +1207,13 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    // Clean up previously deleted static cards
+    const removedStaticCards = JSON.parse(localStorage.getItem('deleted_static_cards') || '[]');
+    removedStaticCards.forEach(id => {
+      const el = document.getElementById(`card-${id}`);
+      if (el) el.remove();
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
       const authNavBtn = document.getElementById('auth-nav-btn');
       const authMobileBtn = document.getElementById('auth-mobile-btn');
@@ -1221,7 +1233,7 @@
 
       // 5-Minute Inactivity Auto-Logout Tracker
       let inactivityTimer = null;
-      const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+      const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
 
       function resetInactivityTimer() {
         if (inactivityTimer) clearTimeout(inactivityTimer);
@@ -1234,7 +1246,6 @@
         }
       }
 
-      // User interaction events to reset timer
       const userActivityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
       userActivityEvents.forEach(evt => {
         window.addEventListener(evt, resetInactivityTimer, { passive: true });
@@ -1262,7 +1273,7 @@
 
       authModalClose.addEventListener('click', closeModal);
 
-      // Handle Sign-In
+      // Login Handler
       loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('auth-email').value.trim();
@@ -1350,7 +1361,7 @@
         console.error('Firestore sync error:', error);
       });
 
-      // Browser Image Optimization & Direct Cloud Storage (Zero CORS Dependency)
+      // Browser Image Optimization & Direct Cloud Storage
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         
@@ -1417,7 +1428,7 @@
         };
       });
 
-      // Owner Delete Handler
+      // Delete Cloud Portfolio Photo
       window.deletePhoto = async (docId) => {
         if (!auth.currentUser) {
           alert("Unauthorized: Only the owner can delete photographs.");
@@ -1431,6 +1442,26 @@
         } catch (err) {
           console.error("Delete error:", err);
           alert("Delete failed: " + err.message);
+        }
+      };
+
+      // Delete Initial Static Photo
+      window.deleteStaticPhoto = (staticId) => {
+        if (!auth.currentUser) {
+          alert("Unauthorized: Only the owner can delete photographs.");
+          return;
+        }
+
+        if (!confirm("Are you sure you want to remove this photograph from your portfolio?")) return;
+
+        const card = document.getElementById(`card-${staticId}`);
+        if (card) {
+          card.remove();
+          const currentDeleted = JSON.parse(localStorage.getItem('deleted_static_cards') || '[]');
+          if (!currentDeleted.includes(staticId)) {
+            currentDeleted.push(staticId);
+            localStorage.setItem('deleted_static_cards', JSON.stringify(currentDeleted));
+          }
         }
       };
     });
