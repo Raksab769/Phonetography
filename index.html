@@ -1,0 +1,81 @@
+<!-- Line 1098: Firebase SDK Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+<script>
+  // Firebase Configuration
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "phonetography-baskar.firebaseapp.com",
+    projectId: "phonetography-baskar",
+    storageBucket: "phonetography-baskar.firebasestorage.app",
+    messagingSenderId: "989656100688",
+    appId: "1:989656100688:web:75db9ff8cb67a9bb9c1587"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+  const auth = firebase.auth();
+
+  // Automatically authenticate as the owner
+  auth.signInWithEmailAndPassword("baskar3797@gmail.com", "Dominar@1200")
+    .then((userCredential) => {
+      console.log("Logged in as owner:", userCredential.user.uid);
+    })
+    .catch((error) => {
+      console.error("Owner authentication error:", error.message);
+    });
+
+  // UI Element Selectors
+  const form = document.getElementById('curation-form');
+  const photoTitleInput = document.getElementById('photo-title');
+  const categoryInput = document.getElementById('photo-category');
+  const fileInput = document.getElementById('file-upload');
+  const submitBtn = document.getElementById('submit-btn');
+  const statusMsg = document.getElementById('status-msg');
+
+  // Upload and Save Handler
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const file = fileInput.files[0];
+    const title = photoTitleInput.value.trim();
+    const category = categoryInput.value.trim();
+
+    if (!file || !title || !category) {
+      alert("Please fill in all fields and select an image.");
+      return;
+    }
+
+    try {
+      submitBtn.disabled = true;
+      submitBtn.innerText = "UPLOADING TO CLOUD...";
+
+      // 1. Upload image to Firebase Storage
+      const storageRef = storage.ref(`portfolio/${Date.now()}_${file.name}`);
+      const snapshot = await storageRef.put(file);
+      const downloadURL = await snapshot.ref.getDownloadURL();
+
+      // 2. Save document record to Cloud Firestore
+      await db.collection("photos").add({
+        title: title,
+        category: category,
+        imageUrl: downloadURL,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      alert("Photo published successfully!");
+      form.reset();
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload: " + error.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerText = "UPLOAD & PUBLISH TO PORTFOLIO";
+    }
+  });
+</script>
