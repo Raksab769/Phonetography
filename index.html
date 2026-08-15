@@ -8,23 +8,22 @@
   <link rel="stylesheet" href="https://use.typekit.net/kpe8rde.css">
   <style id="page-theme">
     :root {
-      /* Photo-realistic Deep-Sea Color Palette */
-      --bg:                    #030911; /* Deep Abyss */
-      --surface:               rgba(22, 24, 28, 0.45); /* Very light murkiness */
-      --text:                  #e0f7ff; /* Cold light from the surface */
-      --fg:                    #80b0c5; /* Silty water haze */
-      --accent:                #2debe0; /* Vivid caustic turquoise */
-      --muted:                 #2a405a; /* Deep water shadow */
-      --link:                  #00e6d9; /* Luminous turquoise */
+      --bg:                    #030911;
+      --surface:               rgba(18, 26, 36, 0.55);
+      --text:                  #e0f7ff;
+      --fg:                    #85afc2;
+      --accent:                #2debe0;
+      --muted:                 #2a405a;
+      --link:                  #00e6d9;
       --link-hover:            #76fff9;
       --text-on-surface-strong:#e0f7ff;
       --link-on-strong:        #00e6d9;
       --link-hover-on-strong:  #76fff9;
       --primary:               #00e6d9;
-      --border:                rgba(45, 235, 224, 0.1); /* Caustic light edges */
+      --border:                rgba(45, 235, 224, 0.15);
       --text-on-accent:        #0e0e0e;
-      --text-display-accent:   #2debe0; /* Vivid caustics on text */
-      --surface-strong:        rgba(3, 9, 17, 0.65); /* Abyss shadow */
+      --text-display-accent:   #2debe0;
+      --surface-strong:        rgba(3, 9, 17, 0.75);
       --hero-glow:             #2debe0;
 
       --text-xs:       0.75rem;
@@ -60,64 +59,7 @@
       position: relative;
     }
 
-    /* Submerged Webpage Perspective & Haze */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at 50% 30%, transparent 20%, #030911 100%);
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.9;
-    }
-
-    section {
-      transform-style: preserve-3d;
-      perspective: 1000px;
-    }
-
-    /* Floating Harmonic Current Animations */
-    @keyframes deepWaterSway {
-      0%   { transform: translate3d(0, 0, 0) rotate3d(0, 0, 0, 0deg); }
-      25%  { transform: translate3d(5px, -10px, -20px) rotate3d(0.2, 0.4, 0.1, 0.8deg); }
-      50%  { transform: translate3d(-5px, 10px, 20px) rotate3d(-0.2, -0.4, -0.1, -0.8deg); }
-      75%  { transform: translate3d(3px, -5px, -10px) rotate3d(0.1, 0.3, 0.1, 0.5deg); }
-      100% { transform: translate3d(0, 0, 0) rotate3d(0, 0, 0, 0deg); }
-    }
-
-    @keyframes submergedFloatDelayed {
-      0%   { transform: translate3d(0, 15px, 30px) rotate3d(-0.3, -0.1, -0.2, -1deg); }
-      50%  { transform: translate3d(0, -15px, -30px) rotate3d(0.3, 0.1, 0.2, 1deg); }
-      100% { transform: translate3d(0, 15px, 30px) rotate3d(-0.3, -0.1, -0.2, -1deg); }
-    }
-
-    .hero-content, .about-content, .philosophy-text, .services-header, .upload-widget-card {
-      animation: deepWaterSway 15s ease-in-out infinite;
-      position: relative;
-      z-index: 2;
-    }
-
-    .hero-image-col, .about-image-col, .philosophy-image {
-      animation: submergedFloatDelayed 20s ease-in-out infinite;
-      position: relative;
-      z-index: 2;
-    }
-
-    .p-card {
-      animation: deepWaterSway 14s ease-in-out infinite;
-      animation-delay: calc(var(--card-index, 0) * 0.7s);
-      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
-      backdrop-filter: blur(12px) contrast(0.8) brightness(0.9);
-      background-color: rgba(22, 24, 28, 0.35); /* Murray water clarity */
-    }
-
-    .p-card:hover {
-      animation-play-state: paused;
-      box-shadow: 0 20px 40px rgba(45, 235, 224, 0.1), 0 0 30px rgba(0, 150, 255, 0.05);
-      transform: scale(1.015) translateZ(30px);
-    }
-
-    /* Water Caustics Canvas */
+    /* Full-screen Fish & Water Animation Canvas */
     #water-canvas {
       position: fixed;
       top: 0;
@@ -125,8 +67,53 @@
       width: 100vw;
       height: 100vh;
       pointer-events: none;
-      z-index: 0;
-      mix-blend-mode: color-dodge;
+      z-index: 1;
+    }
+
+    section {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Gentle Buoyant Harmonic Animations */
+    @keyframes deepWaterSway {
+      0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+      50%  { transform: translate3d(-3px, -8px, 0) rotate(0.4deg); }
+      100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    }
+
+    @keyframes submergedFloatDelayed {
+      0%   { transform: translate3d(0, 8px, 0) rotate(-0.3deg); }
+      50%  { transform: translate3d(0, -8px, 0) rotate(0.3deg); }
+      100% { transform: translate3d(0, 8px, 0) rotate(-0.3deg); }
+    }
+
+    .hero-content, .about-content, .philosophy-text, .services-header, .upload-widget-card {
+      animation: deepWaterSway 12s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-image-col, .about-image-col, .philosophy-image {
+      animation: submergedFloatDelayed 14s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    .p-card {
+      animation: deepWaterSway 10s ease-in-out infinite;
+      animation-delay: calc(var(--card-index, 0) * 0.5s);
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+      backdrop-filter: blur(10px);
+      background-color: var(--surface);
+    }
+
+    .p-card:hover {
+      animation-play-state: paused;
+      box-shadow: 0 16px 36px rgba(45, 235, 224, 0.12), 0 0 25px rgba(0, 150, 255, 0.08);
+      transform: scale(1.02);
     }
 
     h1, h2, h3, h4 {
@@ -171,7 +158,7 @@
       top: 0; left: 0; right: 0;
       z-index: 1000;
       height: var(--nav-height);
-      background-color: rgba(3, 9, 17, 0.7);
+      background-color: rgba(3, 9, 17, 0.78);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
@@ -376,7 +363,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      filter: brightness(0.85) contrast(1.1) saturate(0.8);
+      filter: brightness(0.85) contrast(1.1) saturate(0.85);
       transition: transform var(--duration-xslow) ease;
     }
     .hero-image-col:hover img { transform: scale(1.02); }
@@ -454,7 +441,7 @@
       object-fit: cover;
       display: block;
       transition: transform var(--duration-slow) ease, filter var(--duration-slow) ease;
-      filter: contrast(0.9) brightness(0.9);
+      filter: contrast(0.95) brightness(0.9);
     }
     .p-card:hover img {
       transform: scale(1.03);
@@ -465,7 +452,7 @@
       position: absolute;
       bottom: 0; left: 0; right: 0;
       padding: 1.5rem;
-      background: linear-gradient(to top, var(-- surface-strong), transparent);
+      background: linear-gradient(to top, var(--surface-strong), transparent);
       transform: translateY(0.5rem);
       opacity: 0;
       transition: opacity var(--duration-base) ease, transform var(--duration-base) ease;
@@ -589,7 +576,7 @@
     .upload-control {
       width: 100%;
       padding: 0.85rem 1rem;
-      background-color: #0c1c2b; /* Murphy blue murk */
+      background-color: #081320;
       border: 1px solid var(--border);
       color: var(--text);
       font-family: var(--font-body);
@@ -676,7 +663,7 @@
       aspect-ratio: 3/4;
       object-fit: cover;
       display: block;
-      filter: brightness(0.8) contrast(1.1) saturate(0.85);
+      filter: brightness(0.85) contrast(1.1) saturate(0.85);
       position: relative;
       z-index: 1;
     }
@@ -875,7 +862,7 @@
 </head>
 <body>
 
-  <!-- Background Water Caustics & Refraction Canvas -->
+  <!-- Background Water Caustics, Fish & Ripples Canvas -->
   <canvas id="water-canvas"></canvas>
 
   <!-- Navigation -->
@@ -1279,15 +1266,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-  <!-- Ultra-Realistic Submerged Webpage & Mouse Physics Engine -->
+  <!-- Swimming Fishes & Real Fluid Ripple Engine -->
   <script>
-    (function initDeepSeaFluidSimulation() {
+    (function initUnderwaterFishesAndWater() {
       const canvas = document.getElementById('water-canvas');
       const ctx = canvas.getContext('2d');
       let width, height;
-      let mouse = { x: null, y: null, px: null, py: null, speed: 0 };
+      let mouse = { x: -1000, y: -1000, px: -1000, py: -1000, speed: 0 };
       const ripples = [];
-      const causticsPattern = [];
+      const fishes = [];
 
       function resize() {
         width = canvas.width = window.innerWidth;
@@ -1296,100 +1283,159 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // Mouse-Fluid Physics Interaction
+      // Fish Entity Class
+      class Fish {
+        constructor() {
+          this.init(true);
+        }
+
+        init(randomX = false) {
+          this.length = 18 + Math.random() * 26; // body length
+          this.width = this.length * 0.28;
+          this.speed = 0.8 + Math.random() * 1.4;
+          this.direction = Math.random() > 0.5 ? 1 : -1; // 1: left->right, -1: right->left
+          this.x = randomX ? Math.random() * width : (this.direction === 1 ? -60 : width + 60);
+          this.y = Math.random() * height;
+          this.targetY = this.y;
+          this.angle = this.direction === 1 ? 0 : Math.PI;
+          this.wiggle = Math.random() * Math.PI * 2;
+          this.wiggleSpeed = 0.12 + Math.random() * 0.08;
+          this.color = Math.random() > 0.35 
+            ? { r: 45, g: 235, b: 224, a: 0.45 + Math.random() * 0.35 } // Luminous Turquoise
+            : { r: 240, g: 170, b: 60, a: 0.35 + Math.random() * 0.35 }; // Amber Gold
+          this.depthScale = 0.65 + Math.random() * 0.55;
+        }
+
+        update() {
+          this.wiggle += this.wiggleSpeed;
+
+          // Wandering depth and subtle harmonic swim curve
+          if (Math.random() < 0.015) {
+            this.targetY = Math.max(80, Math.min(height - 80, this.y + (Math.random() - 0.5) * 200));
+          }
+          this.y += (this.targetY - this.y) * 0.02;
+
+          // Mouse avoidance & current interaction
+          const dx = this.x - mouse.x;
+          const dy = this.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 140) {
+            const force = (140 - dist) / 140;
+            this.x += (dx / dist) * force * 4.5;
+            this.y += (dy / dist) * force * 4.5;
+          }
+
+          // Forward swimming
+          this.x += Math.cos(this.angle) * (this.speed * this.depthScale);
+          this.y += Math.sin(this.angle) * (this.speed * 0.4);
+
+          // Recycle when offscreen
+          if (this.direction === 1 && this.x > width + 100) this.init(false);
+          if (this.direction === -1 && this.x < -100) this.init(false);
+        }
+
+        draw(ctx) {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.scale(this.depthScale, this.depthScale);
+          ctx.rotate(this.angle);
+
+          const finWave = Math.sin(this.wiggle) * 4;
+          const tailWave = Math.sin(this.wiggle - 1) * 7;
+
+          // Body Gradient
+          const grad = ctx.createLinearGradient(-this.length * 0.6, 0, this.length * 0.6, 0);
+          grad.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.1)`);
+          grad.addColorStop(0.5, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a})`);
+          grad.addColorStop(1, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a * 0.8})`);
+
+          // Main streamlined fish body
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(this.length * 0.5, 0); // Head tip
+          ctx.bezierCurveTo(this.length * 0.2, -this.width, -this.length * 0.3, -this.width * 0.8, -this.length * 0.5, 0);
+          ctx.bezierCurveTo(-this.length * 0.3, this.width * 0.8, this.length * 0.2, this.width, this.length * 0.5, 0);
+          ctx.fill();
+
+          // Delicate Flapping Tail Fin
+          ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a * 0.6})`;
+          ctx.beginPath();
+          ctx.moveTo(-this.length * 0.5, 0);
+          ctx.lineTo(-this.length * 0.85 + tailWave * 0.4, -this.width * 1.1 + tailWave);
+          ctx.bezierCurveTo(-this.length * 0.7, 0, -this.length * 0.7, 0, -this.length * 0.85 + tailWave * 0.4, this.width * 1.1 + tailWave);
+          ctx.closePath();
+          ctx.fill();
+
+          // Pectoral Side Fin
+          ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a * 0.4})`;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(this.length * 0.1, this.width * 1.3 + finWave, -this.length * 0.2, this.width * 1.1 + finWave);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.restore();
+        }
+      }
+
+      // Initialize School of Fishes
+      const totalFishes = Math.max(10, Math.floor(window.innerWidth / 120));
+      for (let i = 0; i < totalFishes; i++) {
+        fishes.push(new Fish());
+      }
+
+      // Mouse Current & Wave Trigger
       window.addEventListener('mousemove', (e) => {
-        const dx = e.clientX - (mouse.x || e.clientX);
-        const dy = e.clientY - (mouse.y || e.clientY);
+        const dx = e.clientX - (mouse.x < 0 ? e.clientX : mouse.x);
+        const dy = e.clientY - (mouse.y < 0 ? e.clientY : mouse.y);
         mouse.speed = Math.sqrt(dx * dx + dy * dy);
         mouse.px = mouse.x;
         mouse.py = mouse.y;
         mouse.x = e.clientX;
         mouse.y = e.clientY;
 
-        // Emit realistic water disturbance along mouse current
-        if (mouse.speed > 1.5) {
+        // Generate fluid water ripples along mouse trajectory
+        if (mouse.speed > 2) {
           ripples.push({
             x: mouse.x,
             y: mouse.y,
-            radius: 2,
-            maxRadius: Math.min(180, 20 + mouse.speed * 2.2),
-            alpha: Math.min(0.7, 0.2 + mouse.speed * 0.015),
-            lineWidth: Math.min(5, 0.8 + mouse.speed * 0.1)
+            radius: 3,
+            maxRadius: Math.min(160, 20 + mouse.speed * 2.0),
+            alpha: Math.min(0.65, 0.25 + mouse.speed * 0.015),
+            lineWidth: Math.min(4, 0.8 + mouse.speed * 0.08)
           });
         }
       });
 
-      // Generate base caustics pattern grid
-      const gridSize = 40;
-      for (let x = 0; x < width + gridSize; x += gridSize) {
-        for (let y = 0; y < height + gridSize; y += gridSize) {
-          causticsPattern.push({ x, y, ox: x, oy: y, size: gridSize });
-        }
-      }
-
-      let time = 0;
-      function renderUnderwaterEnvironment() {
-        time += 0.008;
+      // Render Loop
+      function renderUnderwaterScene() {
         ctx.clearRect(0, 0, width, height);
 
-        // 1. Photo-Realistic Background Caustic Projections
-        ctx.save();
-        ctx.fillStyle = 'rgba(45, 235, 224, 0.015)'; // Realistic caustic turquoise
-        ctx.globalCompositeOperation = 'color-dodge';
-
-        for (let i = 0; i < causticsPattern.length; i++) {
-          const p = causticsPattern[i];
-          const pulse = Math.sin(time * 1.5 + (p.ox * 0.01) + (p.oy * 0.008));
-          p.x = p.ox + Math.sin(time + p.oy * 0.01) * 60;
-          p.y = p.oy + Math.cos(time + p.ox * 0.01) * 60;
-          
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * (1 + pulse * 0.4), 0, Math.PI * 2);
-          ctx.fill();
+        // 1. Draw and animate swimming fishes
+        for (let i = 0; i < fishes.length; i++) {
+          fishes[i].update();
+          fishes[i].draw(ctx);
         }
-        ctx.restore();
 
-        // 2. Underwater Depth & Haze Gradient
-        const gradient = ctx.createRadialGradient(
-          width * 0.5 + Math.sin(time * 0.4) * 80, 
-          height * 0.4 + Math.cos(time * 0.3) * 60, 
-          height * 0.1, 
-          width * 0.5, 
-          height * 0.5, 
-          Math.max(width, height) * 0.8
-        );
-        gradient.addColorStop(0, 'rgba(45, 235, 224, 0.02)'); // Cold turquoise surface light
-        gradient.addColorStop(0.6, 'rgba(12, 32, 50, 0.07)'); // Cold Murray haze
-        gradient.addColorStop(1, 'rgba(3, 9, 17, 0.0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
-
-        // 3. Ultra-Realistic Ripple Physics & Content Distortion
+        // 2. Render dynamic water flow & ripples
         ctx.save();
         for (let i = ripples.length - 1; i >= 0; i--) {
           const r = ripples[i];
-          r.radius += 2.8;
-          r.alpha *= 0.94;
+          r.radius += 2.6;
+          r.alpha *= 0.945;
 
           // Inner caustic ring
           ctx.beginPath();
           ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(45, 235, 224, ${r.alpha * 0.7})`;
+          ctx.strokeStyle = `rgba(45, 235, 224, ${r.alpha * 0.75})`;
           ctx.lineWidth = r.lineWidth;
           ctx.stroke();
 
-          // Outer refraction refraction ring
+          // Outer refraction ring
           ctx.beginPath();
-          ctx.arc(r.x, r.y, r.radius * 0.8, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(80, 180, 255, ${r.alpha * 0.2})`;
-          ctx.lineWidth = r.lineWidth * 0.5;
-          ctx.stroke();
-
-          // Prismatic aberration edge
-          ctx.beginPath();
-          ctx.arc(r.x, r.y, r.radius * 0.92, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(255, 120, 80, ${r.alpha * 0.1})`;
-          ctx.lineWidth = r.lineWidth * 0.3;
+          ctx.arc(r.x, r.y, r.radius * 0.78, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(0, 160, 255, ${r.alpha * 0.28})`;
+          ctx.lineWidth = r.lineWidth * 0.6;
           ctx.stroke();
 
           if (r.alpha < 0.005 || r.radius > r.maxRadius) {
@@ -1398,9 +1444,9 @@
         }
         ctx.restore();
 
-        requestAnimationFrame(renderUnderwaterEnvironment);
+        requestAnimationFrame(renderUnderwaterScene);
       }
-      renderUnderwaterEnvironment();
+      renderUnderwaterScene();
     })();
   </script>
 
@@ -1555,7 +1601,7 @@
           `;
           lightboxesContainer.appendChild(lbModal);
 
-          // Card Item with deep-water current index
+          // Card Item
           const card = document.createElement('div');
           card.className = 'p-card p-card-custom p-card-dynamic';
           card.id = `card-${docId}`;
