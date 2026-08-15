@@ -356,19 +356,21 @@ details.nav-mobile[open] .nav-drawer { display: flex; }
 .hero-cta-group{ animation: fade-in-up var(--duration-slow) 0.55s ease both; }
 
 @media (max-width: 900px) {
-  .hero {
-    grid-template-columns: 1fr;
-    min-height: auto;
+  /* center the cropped image focal point on small screens */
+  .hero-image-col img {
+    object-position: center;
   }
-  .hero-content {
-    padding-top: calc(var(--nav-height) + 3rem);
-    padding-bottom: 3rem;
+
+  /* Optional: if you prefer to show the entire image (letterboxed) instead of cropping,
+     uncomment these instead of the object-position rule:  */
+  .hero-image-col img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-position: center;
+    background-color: var(--bg); /* avoids white gaps on some images */
   }
-  .hero-image-col {
-    height: 55vw;
-    min-height: 260px;
-  }
-  .hero-image-overlay { display: none; }
+
 }
 </style><style>
 .portfolio {
