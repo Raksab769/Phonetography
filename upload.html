@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phonetography | Visual Storytelling</title>
+  
+  <style>
+    :root {
+      --bg-dark: #0f1015;
+      --card-bg: #181920;
+      --accent: #d4a373;
+      --accent-hover: #b88656;
+      --text: #f3f3f3;
+      --text-muted: #8e909a;
+      --border: #2a2b36;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    header p {
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .curation-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .curation-section h2 {
+      font-size: 1.1rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-align: center;
+    }
+
+    .curation-section h3 {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .curation-section p.subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: #111217;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--accent);
+      background: #13141a;
+      border-radius: 6px;
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-zone span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    button.btn-primary {
+      width: 100%;
+      background-color: var(--accent);
+      color: #111;
+      border: none;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background-color 0.2s ease;
+    }
+
+    button.btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    button.btn-primary:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .portfolio-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .portfolio-item img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+    }
+
+    .portfolio-item .photo-info {
+      padding: 1rem;
+    }
+
+    .portfolio-item .photo-info h4 {
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .portfolio-item .photo-info p {
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Phonetography</h1>
+      <p>Visual Storytelling Through Mobile Optics</p>
+    </header>
+
+    <!-- Upload & Curation Form -->
+    <section class="curation-section">
+      <h2>Live Portfolio Curation</h2>
+      <h3>Add New Photograph</h3>
+      <p class="subtitle">Select a mobile capture from your device to immediately add it to the portfolio gallery.</p>
+
+      <form id="curation-form">
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="photo-title">Photo Title</label>
+            <input type="text" id="photo-title" placeholder="e.g. Monsoon Sky" required />
+          </div>
+          <div class="input-group">
+            <label for="photo-category">Category</label>
+            <input type="text" id="photo-category" placeholder="e.g. Minimal / Nature" required />
+          </div>
+        </div>
+
+        <div class="upload-zone">
+          <input type="file" id="photo-file" accept="image/jpeg,image/png,image/webp" required />
+          <div id="file-name-display">Click or drop image file here</div>
+          <span>Supports JPG, PNG, WEBP</span>
+        </div>
+
+        <button type="submit" id="upload-submit-btn" class="btn-primary">Upload & Publish to Portfolio</button>
+      </form>
+    </section>
+
+    <!-- Dynamic Portfolio Display -->
+    <section>
+      <h2 style="margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent);">The Portfolio</h2>
+      <div class="portfolio-grid" id="dynamic-lightbox-grid"></div>
+    </section>
+  </div>
+
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+  <script>
+    // 1. Firebase Initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyD75z829v-yfv9jY4nltl3r70sOa2cQQr",
+      authDomain: "phonetography-baskar.firebaseapp.com",
+      projectId: "phonetography-baskar",
+      storageBucket: "phonetography-baskar.firebasestorage.app",
+      messagingSenderId: "989656100688",
+      appId: "1:989656100688:web:75db9ff8cb67a9bb9c1587"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    const auth = firebase.auth();
+
+    // 2. Authenticate as Owner
+    auth.signInWithEmailAndPassword("baskar3797@gmail.com", "Dominar@1200")
+      .then((userCredential) => {
+        console.log("Logged in as owner:", userCredential.user.uid);
+      })
+      .catch((error) => {
+        console.error("Owner authentication error:", error.message);
+      });
+
+    // 3. UI Interactions & Upload Handling
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('curation-form');
+      const photoTitleInput = document.getElementById('photo-title');
+      const categoryInput = document.getElementById('photo-category');
+      const fileInput = document.getElementById('photo-file');
+      const fileNameDisplay = document.getElementById('file-name-display');
+      const submitBtn = document.getElementById('upload-submit-btn');
+      const portfolioGrid = document.getElementById('dynamic-lightbox-grid');
+
+      // Update filename label on file pick
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          fileNameDisplay.textContent = `Selected: ${e.target.files[0].name}`;
+        }
+      });
+
+      // Submit Form
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const file = fileInput.files[0];
+        const title = photoTitleInput.value.trim();
+        const category = categoryInput.value.trim();
+
+        if (!file || !title || !category) {
+          alert('Please fill all fields and select an image file.');
+          return;
+        }
+
+        try {
+          submitBtn.disabled = true;
+          submitBtn.innerText = 'UPLOADING TO CLOUD...';
+
+          // Upload image binary to Firebase Storage
+          const storageRef = storage.ref(`portfolio/${Date.now()}_${file.name}`);
+          const uploadTask = await storageRef.put(file);
+          const downloadUrl = await uploadTask.ref.getDownloadURL();
+
+          // Write record to Firestore
+          await db.collection('photos').add({
+            title: title,
+            category: category,
+            imageUrl: downloadUrl,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          alert('Photograph published successfully!');
+          form.reset();
+          fileNameDisplay.textContent = 'Click or drop image file here';
+        } catch (err) {
+          console.error('Upload Error:', err);
+          alert('Upload failed: ' + err.message);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'UPLOAD & PUBLISH TO PORTFOLIO';
+        }
+      });
+
+      // Realtime Gallery Listener
+      db.collection('photos')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot((snapshot) => {
+          portfolioGrid.innerHTML = '';
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const photoCard = document.createElement('div');
+            photoCard.className = 'portfolio-item';
+            photoCard.innerHTML = `
+              <img src="${data.imageUrl}" alt="${data.title}" loading="lazy" />
+              <div class="photo-info">
+                <h4>${data.title}</h4>
+                <p>${data.category}</p>
+              </div>
+            `;
+            portfolioGrid.appendChild(photoCard);
+          });
+        }, (error) => {
+          console.error('Firestore sync error:', error);
+        });
+    });
+  </script>
+</body>
+</html>
