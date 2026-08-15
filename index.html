@@ -8,23 +8,24 @@
   <link rel="stylesheet" href="https://use.typekit.net/kpe8rde.css">
   <style id="page-theme">
     :root {
-      --bg:                    #0a0b0e;
-      --surface:               rgba(22, 24, 28, 0.75);
-      --text:                  #e8e4de;
-      --fg:                    #8a857c;
-      --accent:                #c9a84c;
-      --muted:                 #4a4540;
-      --link:                  #c9a84c;
-      --link-hover:            #e8c96a;
-      --text-on-surface-strong:#e8e4de;
-      --link-on-strong:        #c9a84c;
-      --link-hover-on-strong:  #e8c96a;
-      --primary:               #c9a84c;
-      --border:                rgba(201, 168, 76, 0.15);
+      /* Photo-realistic Deep-Sea Color Palette */
+      --bg:                    #030911; /* Deep Abyss */
+      --surface:               rgba(22, 24, 28, 0.45); /* Very light murkiness */
+      --text:                  #e0f7ff; /* Cold light from the surface */
+      --fg:                    #80b0c5; /* Silty water haze */
+      --accent:                #2debe0; /* Vivid caustic turquoise */
+      --muted:                 #2a405a; /* Deep water shadow */
+      --link:                  #00e6d9; /* Luminous turquoise */
+      --link-hover:            #76fff9;
+      --text-on-surface-strong:#e0f7ff;
+      --link-on-strong:        #00e6d9;
+      --link-hover-on-strong:  #76fff9;
+      --primary:               #00e6d9;
+      --border:                rgba(45, 235, 224, 0.1); /* Caustic light edges */
       --text-on-accent:        #0e0e0e;
-      --text-display-accent:   #c9a84c;
-      --surface-strong:        rgba(10, 12, 16, 0.85);
-      --hero-glow:             #c9a84c;
+      --text-display-accent:   #2debe0; /* Vivid caustics on text */
+      --surface-strong:        rgba(3, 9, 17, 0.65); /* Abyss shadow */
+      --hero-glow:             #2debe0;
 
       --text-xs:       0.75rem;
       --text-sm:       0.8125rem;
@@ -59,7 +60,64 @@
       position: relative;
     }
 
-    /* Water Canvas & Interactive Ripple Layer */
+    /* Submerged Webpage Perspective & Haze */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, transparent 20%, #030911 100%);
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.9;
+    }
+
+    section {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    /* Floating Harmonic Current Animations */
+    @keyframes deepWaterSway {
+      0%   { transform: translate3d(0, 0, 0) rotate3d(0, 0, 0, 0deg); }
+      25%  { transform: translate3d(5px, -10px, -20px) rotate3d(0.2, 0.4, 0.1, 0.8deg); }
+      50%  { transform: translate3d(-5px, 10px, 20px) rotate3d(-0.2, -0.4, -0.1, -0.8deg); }
+      75%  { transform: translate3d(3px, -5px, -10px) rotate3d(0.1, 0.3, 0.1, 0.5deg); }
+      100% { transform: translate3d(0, 0, 0) rotate3d(0, 0, 0, 0deg); }
+    }
+
+    @keyframes submergedFloatDelayed {
+      0%   { transform: translate3d(0, 15px, 30px) rotate3d(-0.3, -0.1, -0.2, -1deg); }
+      50%  { transform: translate3d(0, -15px, -30px) rotate3d(0.3, 0.1, 0.2, 1deg); }
+      100% { transform: translate3d(0, 15px, 30px) rotate3d(-0.3, -0.1, -0.2, -1deg); }
+    }
+
+    .hero-content, .about-content, .philosophy-text, .services-header, .upload-widget-card {
+      animation: deepWaterSway 15s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-image-col, .about-image-col, .philosophy-image {
+      animation: submergedFloatDelayed 20s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    .p-card {
+      animation: deepWaterSway 14s ease-in-out infinite;
+      animation-delay: calc(var(--card-index, 0) * 0.7s);
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+      backdrop-filter: blur(12px) contrast(0.8) brightness(0.9);
+      background-color: rgba(22, 24, 28, 0.35); /* Murray water clarity */
+    }
+
+    .p-card:hover {
+      animation-play-state: paused;
+      box-shadow: 0 20px 40px rgba(45, 235, 224, 0.1), 0 0 30px rgba(0, 150, 255, 0.05);
+      transform: scale(1.015) translateZ(30px);
+    }
+
+    /* Water Caustics Canvas */
     #water-canvas {
       position: fixed;
       top: 0;
@@ -68,45 +126,7 @@
       height: 100vh;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.85;
-      mix-blend-mode: screen;
-    }
-
-    /* Buoyant Ambient Page Float Animations */
-    @keyframes floatingBobSlow {
-      0%   { transform: translateY(0px) rotate(0deg); }
-      50%  { transform: translateY(-7px) rotate(0.4deg); }
-      100% { transform: translateY(0px) rotate(0deg); }
-    }
-
-    @keyframes floatingBobDelayed {
-      0%   { transform: translateY(-5px) rotate(-0.3deg); }
-      50%  { transform: translateY(3px) rotate(0.3deg); }
-      100% { transform: translateY(-5px) rotate(-0.3deg); }
-    }
-
-    .hero-content, .about-content, .philosophy-text, .services-header {
-      animation: floatingBobSlow 8s ease-in-out infinite;
-      position: relative;
-      z-index: 2;
-    }
-
-    .hero-image-col, .about-image-col, .philosophy-image {
-      animation: floatingBobDelayed 9s ease-in-out infinite;
-      position: relative;
-      z-index: 2;
-    }
-
-    .p-card {
-      animation: floatingBobSlow 7s ease-in-out infinite;
-      animation-delay: calc(var(--card-index, 0) * 0.45s);
-      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
-      backdrop-filter: blur(8px);
-    }
-
-    .p-card:hover {
-      animation-play-state: paused;
-      box-shadow: 0 15px 35px rgba(201, 168, 76, 0.18), 0 0 20px rgba(0, 150, 255, 0.1);
+      mix-blend-mode: color-dodge;
     }
 
     h1, h2, h3, h4 {
@@ -151,8 +171,8 @@
       top: 0; left: 0; right: 0;
       z-index: 1000;
       height: var(--nav-height);
-      background-color: rgba(10, 11, 14, 0.82);
-      backdrop-filter: blur(14px);
+      background-color: rgba(3, 9, 17, 0.7);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
 
@@ -356,10 +376,10 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      filter: brightness(0.88) contrast(1.05);
+      filter: brightness(0.85) contrast(1.1) saturate(0.8);
       transition: transform var(--duration-xslow) ease;
     }
-    .hero-image-col:hover img { transform: scale(1.03); }
+    .hero-image-col:hover img { transform: scale(1.02); }
 
     .hero-image-overlay {
       position: absolute;
@@ -434,17 +454,18 @@
       object-fit: cover;
       display: block;
       transition: transform var(--duration-slow) ease, filter var(--duration-slow) ease;
+      filter: contrast(0.9) brightness(0.9);
     }
     .p-card:hover img {
-      transform: scale(1.04);
-      filter: brightness(0.75);
+      transform: scale(1.03);
+      filter: brightness(0.85);
     }
 
     .p-card-caption {
       position: absolute;
       bottom: 0; left: 0; right: 0;
       padding: 1.5rem;
-      background: linear-gradient(to top, color-mix(in srgb, var(--bg) 85%, transparent), transparent);
+      background: linear-gradient(to top, var(-- surface-strong), transparent);
       transform: translateY(0.5rem);
       opacity: 0;
       transition: opacity var(--duration-base) ease, transform var(--duration-base) ease;
@@ -494,10 +515,11 @@
       position: fixed;
       inset: 0;
       z-index: 9000;
-      background: rgba(0,0,0,0.94);
+      background: rgba(3, 9, 17, 0.96);
       align-items: center;
       justify-content: center;
       padding: 2rem;
+      backdrop-filter: blur(20px);
     }
     .lightbox-modal:target, .lightbox-modal.active { display: flex; }
     .lightbox-content {
@@ -529,7 +551,7 @@
       border: 1px solid var(--accent);
       border-radius: 2px;
       display: none; 
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
     }
     .upload-widget-header {
       margin-bottom: 2rem;
@@ -567,7 +589,7 @@
     .upload-control {
       width: 100%;
       padding: 0.85rem 1rem;
-      background-color: var(--bg);
+      background-color: #0c1c2b; /* Murphy blue murk */
       border: 1px solid var(--border);
       color: var(--text);
       font-family: var(--font-body);
@@ -616,7 +638,7 @@
       top: 1rem;
       left: 1rem;
       z-index: 15;
-      background: rgba(220, 53, 69, 0.9);
+      background: rgba(220, 53, 69, 0.95);
       color: #fff;
       border: none;
       font-size: 0.65rem;
@@ -640,7 +662,7 @@
       padding: clamp(5rem, 10vw, 10rem) 0;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(14px);
     }
     .about-grid {
       display: grid;
@@ -654,7 +676,7 @@
       aspect-ratio: 3/4;
       object-fit: cover;
       display: block;
-      filter: brightness(0.9) contrast(1.05) saturate(0.9);
+      filter: brightness(0.8) contrast(1.1) saturate(0.85);
       position: relative;
       z-index: 1;
     }
@@ -721,7 +743,7 @@
     }
     .service-item:nth-child(odd) { padding-right: 3rem; border-right: 1px solid var(--border); }
     .service-item:nth-child(even) { padding-left: 3rem; }
-    .service-item:hover { background-color: color-mix(in srgb, var(--accent) 4%, transparent); }
+    .service-item:hover { background-color: color-mix(in srgb, var(--accent) 5%, transparent); }
     .service-num {
       font-family: var(--font-display);
       font-size: var(--text-xs);
@@ -748,7 +770,7 @@
       padding: clamp(5rem, 10vw, 10rem) 0;
       position: relative;
       overflow: hidden;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(16px);
     }
     .philosophy-inner {
       display: grid;
@@ -764,7 +786,7 @@
       aspect-ratio: 4/5;
       object-fit: cover;
       display: block;
-      filter: brightness(0.85) contrast(1.1) saturate(0.7);
+      filter: brightness(0.8) contrast(1.15) saturate(0.8);
     }
     .philosophy-pull {
       position: absolute;
@@ -810,11 +832,11 @@
       background-color: var(--surface);
       border: 1px solid var(--border);
       transition: border-color var(--duration-fast) ease, background-color var(--duration-fast) ease;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
     }
     .contact-channel:hover {
       border-color: var(--accent);
-      background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+      background-color: color-mix(in srgb, var(--accent) 8%, transparent);
     }
     .channel-icon { width: 2rem; height: 2rem; color: var(--accent); flex-shrink: 0; }
     .channel-type { font-size: var(--text-xs); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.2rem; }
@@ -828,6 +850,7 @@
       padding: 3.5rem 0;
       position: relative;
       z-index: 2;
+      backdrop-filter: blur(20px);
     }
     .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; }
     .footer-brand { font-family: var(--font-display); font-size: var(--text-lg); }
@@ -852,7 +875,7 @@
 </head>
 <body>
 
-  <!-- Interactive Water Ripple Background Canvas -->
+  <!-- Background Water Caustics & Refraction Canvas -->
   <canvas id="water-canvas"></canvas>
 
   <!-- Navigation -->
@@ -1256,14 +1279,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-  <!-- Interactive Water Ripple Engine -->
+  <!-- Ultra-Realistic Submerged Webpage & Mouse Physics Engine -->
   <script>
-    (function initWaterSimulation() {
+    (function initDeepSeaFluidSimulation() {
       const canvas = document.getElementById('water-canvas');
       const ctx = canvas.getContext('2d');
       let width, height;
       let mouse = { x: null, y: null, px: null, py: null, speed: 0 };
       const ripples = [];
+      const causticsPattern = [];
 
       function resize() {
         width = canvas.width = window.innerWidth;
@@ -1272,6 +1296,7 @@
       window.addEventListener('resize', resize);
       resize();
 
+      // Mouse-Fluid Physics Interaction
       window.addEventListener('mousemove', (e) => {
         const dx = e.clientX - (mouse.x || e.clientX);
         const dy = e.clientY - (mouse.y || e.clientY);
@@ -1281,66 +1306,101 @@
         mouse.x = e.clientX;
         mouse.y = e.clientY;
 
-        // Emit water ripples along mouse flow
-        if (mouse.speed > 2) {
+        // Emit realistic water disturbance along mouse current
+        if (mouse.speed > 1.5) {
           ripples.push({
             x: mouse.x,
             y: mouse.y,
-            radius: 5,
-            maxRadius: Math.min(120, 25 + mouse.speed * 1.5),
-            alpha: 0.5,
-            lineWidth: Math.min(4, 1 + mouse.speed * 0.08)
+            radius: 2,
+            maxRadius: Math.min(180, 20 + mouse.speed * 2.2),
+            alpha: Math.min(0.7, 0.2 + mouse.speed * 0.015),
+            lineWidth: Math.min(5, 0.8 + mouse.speed * 0.1)
           });
         }
       });
 
+      // Generate base caustics pattern grid
+      const gridSize = 40;
+      for (let x = 0; x < width + gridSize; x += gridSize) {
+        for (let y = 0; y < height + gridSize; y += gridSize) {
+          causticsPattern.push({ x, y, ox: x, oy: y, size: gridSize });
+        }
+      }
+
       let time = 0;
-      function renderWater() {
-        time += 0.015;
+      function renderUnderwaterEnvironment() {
+        time += 0.008;
         ctx.clearRect(0, 0, width, height);
 
-        // Ambient caustics gradient & water waves
+        // 1. Photo-Realistic Background Caustic Projections
+        ctx.save();
+        ctx.fillStyle = 'rgba(45, 235, 224, 0.015)'; // Realistic caustic turquoise
+        ctx.globalCompositeOperation = 'color-dodge';
+
+        for (let i = 0; i < causticsPattern.length; i++) {
+          const p = causticsPattern[i];
+          const pulse = Math.sin(time * 1.5 + (p.ox * 0.01) + (p.oy * 0.008));
+          p.x = p.ox + Math.sin(time + p.oy * 0.01) * 60;
+          p.y = p.oy + Math.cos(time + p.ox * 0.01) * 60;
+          
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * (1 + pulse * 0.4), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // 2. Underwater Depth & Haze Gradient
         const gradient = ctx.createRadialGradient(
-          width * 0.5 + Math.sin(time * 0.8) * 120, 
-          height * 0.5 + Math.cos(time * 0.6) * 120, 
-          80, 
+          width * 0.5 + Math.sin(time * 0.4) * 80, 
+          height * 0.4 + Math.cos(time * 0.3) * 60, 
+          height * 0.1, 
           width * 0.5, 
           height * 0.5, 
           Math.max(width, height) * 0.8
         );
-        gradient.addColorStop(0, 'rgba(201, 168, 76, 0.04)');
-        gradient.addColorStop(0.5, 'rgba(20, 35, 60, 0.06)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(0, 'rgba(45, 235, 224, 0.02)'); // Cold turquoise surface light
+        gradient.addColorStop(0.6, 'rgba(12, 32, 50, 0.07)'); // Cold Murray haze
+        gradient.addColorStop(1, 'rgba(3, 9, 17, 0.0)');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, width, height);
 
-        // Render fluid trails
+        // 3. Ultra-Realistic Ripple Physics & Content Distortion
+        ctx.save();
         for (let i = ripples.length - 1; i >= 0; i--) {
           const r = ripples[i];
-          r.radius += 2.2;
-          r.alpha *= 0.95;
+          r.radius += 2.8;
+          r.alpha *= 0.94;
 
+          // Inner caustic ring
           ctx.beginPath();
           ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(201, 168, 76, ${r.alpha * 0.6})`;
+          ctx.strokeStyle = `rgba(45, 235, 224, ${r.alpha * 0.7})`;
           ctx.lineWidth = r.lineWidth;
           ctx.stroke();
 
-          // Outer refraction ring
+          // Outer refraction refraction ring
           ctx.beginPath();
-          ctx.arc(r.x, r.y, r.radius * 0.75, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(120, 180, 255, ${r.alpha * 0.25})`;
-          ctx.lineWidth = r.lineWidth * 0.6;
+          ctx.arc(r.x, r.y, r.radius * 0.8, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(80, 180, 255, ${r.alpha * 0.2})`;
+          ctx.lineWidth = r.lineWidth * 0.5;
           ctx.stroke();
 
-          if (r.alpha < 0.01 || r.radius > r.maxRadius) {
+          // Prismatic aberration edge
+          ctx.beginPath();
+          ctx.arc(r.x, r.y, r.radius * 0.92, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 120, 80, ${r.alpha * 0.1})`;
+          ctx.lineWidth = r.lineWidth * 0.3;
+          ctx.stroke();
+
+          if (r.alpha < 0.005 || r.radius > r.maxRadius) {
             ripples.splice(i, 1);
           }
         }
+        ctx.restore();
 
-        requestAnimationFrame(renderWater);
+        requestAnimationFrame(renderUnderwaterEnvironment);
       }
-      renderWater();
+      renderUnderwaterEnvironment();
     })();
   </script>
 
@@ -1495,7 +1555,7 @@
           `;
           lightboxesContainer.appendChild(lbModal);
 
-          // Card Item with water float index
+          // Card Item with deep-water current index
           const card = document.createElement('div');
           card.className = 'p-card p-card-custom p-card-dynamic';
           card.id = `card-${docId}`;
