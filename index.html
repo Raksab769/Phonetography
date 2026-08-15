@@ -23,7 +23,7 @@
       --border:                rgba(45, 235, 224, 0.15);
       --text-on-accent:        #0e0e0e;
       --text-display-accent:   #2debe0;
-      --surface-strong:        rgba(3, 9, 17, 0.75);
+      --surface-strong:        rgba(3, 9, 17, 0.98); /* Solid mobile menu background */
       --hero-glow:             #2debe0;
 
       --text-xs:       0.75rem;
@@ -59,7 +59,7 @@
       position: relative;
     }
 
-    /* Full-screen Fish & Water Animation Canvas */
+    /* Full-screen Birds & Atmosphere Animation Canvas */
     #water-canvas {
       position: fixed;
       top: 0;
@@ -76,45 +76,6 @@
       perspective: 1000px;
       position: relative;
       z-index: 2;
-    }
-
-    /* Gentle Buoyant Harmonic Animations */
-    @keyframes deepWaterSway {
-      0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-      50%  { transform: translate3d(-3px, -8px, 0) rotate(0.4deg); }
-      100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-    }
-
-    @keyframes submergedFloatDelayed {
-      0%   { transform: translate3d(0, 8px, 0) rotate(-0.3deg); }
-      50%  { transform: translate3d(0, -8px, 0) rotate(0.3deg); }
-      100% { transform: translate3d(0, 8px, 0) rotate(-0.3deg); }
-    }
-
-    .hero-content, .about-content, .philosophy-text, .services-header, .upload-widget-card {
-      animation: deepWaterSway 12s ease-in-out infinite;
-      position: relative;
-      z-index: 2;
-    }
-
-    .hero-image-col, .about-image-col, .philosophy-image {
-      animation: submergedFloatDelayed 14s ease-in-out infinite;
-      position: relative;
-      z-index: 2;
-    }
-
-    .p-card {
-      animation: deepWaterSway 10s ease-in-out infinite;
-      animation-delay: calc(var(--card-index, 0) * 0.5s);
-      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
-      backdrop-filter: blur(10px);
-      background-color: var(--surface);
-    }
-
-    .p-card:hover {
-      animation-play-state: paused;
-      box-shadow: 0 16px 36px rgba(45, 235, 224, 0.12), 0 0 25px rgba(0, 150, 255, 0.08);
-      transform: scale(1.02);
     }
 
     h1, h2, h3, h4 {
@@ -159,7 +120,7 @@
       top: 0; left: 0; right: 0;
       z-index: 1000;
       height: var(--nav-height);
-      background-color: rgba(3, 9, 17, 0.78);
+      background-color: rgba(3, 9, 17, 0.92);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
@@ -228,19 +189,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      z-index: 1002;
     }
     .nav-toggle::marker, .nav-toggle::-webkit-details-marker { display: none; }
 
+    /* Solid Opaque Mobile Menu Drawer */
     .nav-drawer {
       display: none;
       position: fixed;
       top: var(--nav-height);
       left: 0; right: 0;
       background-color: var(--surface-strong);
-      border-bottom: 1px solid var(--border);
-      padding: 2rem clamp(1.5rem, 5vw, 5rem);
+      border-bottom: 1px solid var(--accent);
+      padding: 2.5rem clamp(1.5rem, 5vw, 5rem);
       flex-direction: column;
       gap: 1.5rem;
+      z-index: 1001;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.9);
     }
     details.nav-mobile[open] .nav-drawer { display: flex; }
 
@@ -480,12 +446,12 @@
       color: var(--accent);
     }
 
-    .p-card-1 { grid-column: 1 / 8;  grid-row: 1; aspect-ratio: 3/2; --card-index: 1; }
-    .p-card-2 { grid-column: 8 / 13; grid-row: 1; aspect-ratio: 4/5; --card-index: 2; }
-    .p-card-3 { grid-column: 1 / 5;  grid-row: 2; aspect-ratio: 4/5; --card-index: 3; }
-    .p-card-4 { grid-column: 5 / 9;  grid-row: 2; aspect-ratio: 1/1; --card-index: 4; }
-    .p-card-5 { grid-column: 9 / 13; grid-row: 2; aspect-ratio: 4/3; --card-index: 5; }
-    .p-card-custom { grid-column: span 4; aspect-ratio: 4/3; --card-index: 6; }
+    .p-card-1 { grid-column: 1 / 8;  grid-row: 1; aspect-ratio: 3/2; }
+    .p-card-2 { grid-column: 8 / 13; grid-row: 1; aspect-ratio: 4/5; }
+    .p-card-3 { grid-column: 1 / 5;  grid-row: 2; aspect-ratio: 4/5; }
+    .p-card-4 { grid-column: 5 / 9;  grid-row: 2; aspect-ratio: 1/1; }
+    .p-card-5 { grid-column: 9 / 13; grid-row: 2; aspect-ratio: 4/3; }
+    .p-card-custom { grid-column: span 4; aspect-ratio: 4/3; }
 
     @media (max-width: 900px) {
       .portfolio-grid { grid-template-columns: 1fr 1fr; }
@@ -863,7 +829,7 @@
 </head>
 <body>
 
-  <!-- Background Swimming Fishes & Clean Water Canvas -->
+  <!-- Background Realistic Flying Birds Canvas -->
   <canvas id="water-canvas"></canvas>
 
   <!-- Navigation -->
@@ -1267,15 +1233,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-  <!-- Realistic Large & Low-Count Swimming Fish Engine -->
+  <!-- Realistic Flying Birds Animation Engine -->
   <script>
-    (function initRealisticFishSimulation() {
+    (function initRealisticBirdsSimulation() {
       const canvas = document.getElementById('water-canvas');
       const ctx = canvas.getContext('2d');
       let width, height;
-      let mouse = { x: -1000, y: -1000, speed: 0 };
-      const ripples = [];
-      const fishes = [];
+      const birds = [];
 
       function resize() {
         width = canvas.width = window.innerWidth;
@@ -1284,169 +1248,76 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // Realistic, Large, Detailed Fish Class
-      class RealisticFish {
+      class Bird {
         constructor() {
           this.init(true);
         }
 
         init(randomX = false) {
-          // Made noticeably larger and count reduced to a minimal, majestic school (4 to 5 fish)
-          this.length = 75 + Math.random() * 45; 
-          this.height = this.length * 0.36;
-          this.speed = 0.5 + Math.random() * 0.6; // slow, realistic gliding
-          this.direction = Math.random() > 0.5 ? 1 : -1;
-          this.x = randomX ? Math.random() * width : (this.direction === 1 ? -150 : width + 150);
-          this.y = 100 + Math.random() * (height - 200);
+          this.x = randomX ? Math.random() * width : -120;
+          this.y = 50 + Math.random() * (height * 0.4); // upper sky / page region
+          this.speed = 1.2 + Math.random() * 0.8;
+          this.wingSpan = 35 + Math.random() * 20;
+          this.wingPhase = Math.random() * Math.PI * 2;
+          this.flapSpeed = 0.08 + Math.random() * 0.04;
+          this.glideTimer = 0;
           this.targetY = this.y;
-          this.angle = this.direction === 1 ? 0 : Math.PI;
-          this.wiggle = Math.random() * Math.PI * 2;
-          this.wiggleSpeed = 0.04 + Math.random() * 0.03; // smooth, heavy motion
-          
-          // Realistic deep water creature tones (silvery scales & iridescent blue-gold)
-          this.colorType = Math.random();
         }
 
         update() {
-          this.wiggle += this.wiggleSpeed;
+          this.wingPhase += this.flapSpeed;
+          this.x += this.speed;
 
-          // Gentle wandering across vertical axis
-          if (Math.random() < 0.008) {
-            this.targetY = Math.max(120, Math.min(height - 120, this.y + (Math.random() - 0.5) * 300));
+          if (Math.random() < 0.01) {
+            this.targetY = Math.max(40, Math.min(height * 0.5, this.y + (Math.random() - 0.5) * 100));
           }
-          this.y += (this.targetY - this.y) * 0.012;
+          this.y += (this.targetY - this.y) * 0.02;
 
-          // Gentle avoidance of mouse cursor
-          const dx = this.x - mouse.x;
-          const dy = this.y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 200) {
-            const force = (200 - dist) / 200;
-            this.x += (dx / dist) * force * 2.5;
-            this.y += (dy / dist) * force * 2.5;
+          if (this.x > width + 150) {
+            this.init(false);
           }
-
-          // Forward gliding motion
-          this.x += Math.cos(this.angle) * this.speed;
-          this.y += Math.sin(this.angle + this.wiggle * 0.5) * 0.3;
-
-          // Screen wrapping / recycling
-          if (this.direction === 1 && this.x > width + 200) this.init(false);
-          if (this.direction === -1 && this.x < -200) this.init(false);
         }
 
         draw(ctx) {
           ctx.save();
           ctx.translate(this.x, this.y);
-          ctx.rotate(this.angle + Math.sin(this.wiggle) * 0.04);
 
-          const bodyLen = this.length;
-          const bodyH = this.height;
-          const tailSway = Math.sin(this.wiggle * 1.2) * 12;
+          // Wing flapping arc calculation
+          const flap = Math.sin(this.wingPhase) * 16;
+          
+          ctx.strokeStyle = 'rgba(200, 230, 245, 0.45)';
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
 
-          // 1. Realistic Tail Fin
+          // Left Wing
           ctx.beginPath();
-          ctx.moveTo(-bodyLen * 0.45, 0);
-          ctx.quadraticCurveTo(-bodyLen * 0.75, -bodyH * 1.2 + tailSway, -bodyLen * 0.9, -bodyH * 1.8 + tailSway * 1.5);
-          ctx.quadraticCurveTo(-bodyLen * 0.7, 0, -bodyLen * 0.9, bodyH * 1.8 + tailSway * 1.5);
-          ctx.quadraticCurveTo(-bodyLen * 0.75, bodyH * 1.2 + tailSway, -bodyLen * 0.45, 0);
-          ctx.fillStyle = 'rgba(30, 150, 170, 0.25)';
-          ctx.fill();
-
-          // 2. Main Fish Body (Silvery iridescent gradient)
-          const bodyGrad = ctx.createLinearGradient(0, -bodyH, 0, bodyH);
-          bodyGrad.addColorStop(0, 'rgba(180, 235, 245, 0.55)');   // dorsal light reflection
-          bodyGrad.addColorStop(0.5, 'rgba(45, 235, 224, 0.35)'); // iridescent turquoise body
-          bodyGrad.addColorStop(1, 'rgba(15, 60, 90, 0.4)');     // shadowed belly
-
-          ctx.beginPath();
-          ctx.moveTo(bodyLen * 0.5, 0); // nose
-          ctx.bezierCurveTo(bodyLen * 0.2, -bodyH * 1.1, -bodyLen * 0.3, -bodyH * 0.9, -bodyLen * 0.45, 0);
-          ctx.bezierCurveTo(-bodyLen * 0.3, bodyH * 0.9, bodyLen * 0.2, bodyH * 1.1, bodyLen * 0.5, 0);
-          ctx.fillStyle = bodyGrad;
-          ctx.fill();
-          ctx.lineWidth = 1.2;
-          ctx.strokeStyle = 'rgba(200, 250, 255, 0.4)';
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(-this.wingSpan * 0.5, -12 - flap, -this.wingSpan, -4 - flap * 0.5);
           ctx.stroke();
 
-          // 3. Pectoral Fin (Side fin)
+          // Right Wing
           ctx.beginPath();
-          ctx.moveTo(-bodyLen * 0.05, bodyH * 0.2);
-          ctx.quadraticCurveTo(bodyLen * 0.1, bodyH * 1.4 + Math.sin(this.wiggle)*6, -bodyLen * 0.15, bodyH * 1.1);
-          ctx.fillStyle = 'rgba(45, 235, 224, 0.3)';
-          ctx.fill();
-
-          // 4. Dorsal Fin (Top fin)
-          ctx.beginPath();
-          ctx.moveTo(-bodyLen * 0.1, -bodyH * 0.85);
-          ctx.quadraticCurveTo(-bodyLen * 0.25, -bodyH * 1.6, -bodyLen * 0.4, -bodyH * 0.9);
-          ctx.fillStyle = 'rgba(30, 150, 170, 0.3)';
-          ctx.fill();
-
-          // 5. Eye
-          ctx.beginPath();
-          ctx.arc(bodyLen * 0.32, -bodyH * 0.25, bodyH * 0.12, 0, Math.PI * 2);
-          ctx.fillStyle = '#030911';
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(bodyLen * 0.33, -bodyH * 0.27, bodyH * 0.04, 0, Math.PI * 2);
-          ctx.fillStyle = '#ffffff';
-          ctx.fill();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(this.wingSpan * 0.5, -12 - flap, this.wingSpan, -4 - flap * 0.5);
+          ctx.stroke();
 
           ctx.restore();
         }
       }
 
-      // Initialize a low count of large, realistic fish (e.g., 5 majestic swimmers)
-      for (let i = 0; i < 5; i++) {
-        fishes.push(new RealisticFish());
+      // Small, elegant flock of 4 realistic soaring birds
+      for (let i = 0; i < 4; i++) {
+        const b = new Bird();
+        b.x = Math.random() * width;
+        birds.push(b);
       }
 
-      // Mouse Current & Wave Trigger
-      window.addEventListener('mousemove', (e) => {
-        const dx = e.clientX - (mouse.x < 0 ? e.clientX : mouse.x);
-        const dy = e.clientY - (mouse.y < 0 ? e.clientY : mouse.y);
-        mouse.speed = Math.sqrt(dx * dx + dy * dy);
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-
-        if (mouse.speed > 2) {
-          ripples.push({
-            x: mouse.x,
-            y: mouse.y,
-            radius: 4,
-            maxRadius: Math.min(180, 30 + mouse.speed * 2.0),
-            alpha: 0.5,
-            lineWidth: 1.5
-          });
-        }
-      });
-
-      // Render Loop
       function renderScene() {
         ctx.clearRect(0, 0, width, height);
 
-        // Update and draw large realistic fish
-        for (let i = 0; i < fishes.length; i++) {
-          fishes[i].update();
-          fishes[i].draw(ctx);
-        }
-
-        // Water ripples
-        for (let i = ripples.length - 1; i >= 0; i--) {
-          const r = ripples[i];
-          r.radius += 2.2;
-          r.alpha *= 0.95;
-
-          ctx.beginPath();
-          ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(45, 235, 224, ${r.alpha * 0.6})`;
-          ctx.lineWidth = r.lineWidth;
-          ctx.stroke();
-
-          if (r.alpha < 0.005 || r.radius > r.maxRadius) {
-            ripples.splice(i, 1);
-          }
+        for (let i = 0; i < birds.length; i++) {
+          birds[i].update();
+          birds[i].draw(ctx);
         }
 
         requestAnimationFrame(renderScene);
@@ -1585,9 +1456,7 @@
         document.querySelectorAll('.p-card-dynamic').forEach(el => el.remove());
         document.querySelectorAll('.lightbox-dynamic').forEach(el => el.remove());
 
-        let count = 6;
         snapshot.forEach((doc) => {
-          count++;
           const data = doc.data();
           const docId = doc.id;
           const isOwner = !!auth.currentUser;
@@ -1610,7 +1479,6 @@
           const card = document.createElement('div');
           card.className = 'p-card p-card-custom p-card-dynamic';
           card.id = `card-${docId}`;
-          card.style.setProperty('--card-index', count);
           card.innerHTML = `
             <button class="btn-delete-card" style="display: ${isOwner ? 'block' : 'none'};" title="Remove Photo" onclick="deletePhoto('${docId}')">Remove</button>
             <img alt="${data.title}" src="${data.imageUrl}">
@@ -1682,7 +1550,7 @@
 
               alert('Photograph published successfully!');
               form.reset();
-          fileNameDisplay.textContent = '';
+              fileNameDisplay.textContent = '';
             } catch (err) {
               console.error("Publishing error:", err);
               alert("Publish failed: " + err.message);
