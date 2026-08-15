@@ -68,6 +68,7 @@
       height: 100vh;
       pointer-events: none;
       z-index: 1;
+      display: block;
     }
 
     section {
@@ -862,7 +863,7 @@
 </head>
 <body>
 
-  <!-- Background Water Caustics, Fish & Ripples Canvas -->
+  <!-- Background Swimming Fishes & Clean Water Canvas -->
   <canvas id="water-canvas"></canvas>
 
   <!-- Navigation -->
@@ -1266,13 +1267,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-  <!-- Swimming Fishes & Real Fluid Ripple Engine -->
+  <!-- Realistic Large & Low-Count Swimming Fish Engine -->
   <script>
-    (function initUnderwaterFishesAndWater() {
+    (function initRealisticFishSimulation() {
       const canvas = document.getElementById('water-canvas');
       const ctx = canvas.getContext('2d');
       let width, height;
-      let mouse = { x: -1000, y: -1000, px: -1000, py: -1000, speed: 0 };
+      let mouse = { x: -1000, y: -1000, speed: 0 };
       const ripples = [];
       const fishes = [];
 
@@ -1283,105 +1284,122 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // Fish Entity Class
-      class Fish {
+      // Realistic, Large, Detailed Fish Class
+      class RealisticFish {
         constructor() {
           this.init(true);
         }
 
         init(randomX = false) {
-          this.length = 18 + Math.random() * 26; // body length
-          this.width = this.length * 0.28;
-          this.speed = 0.8 + Math.random() * 1.4;
-          this.direction = Math.random() > 0.5 ? 1 : -1; // 1: left->right, -1: right->left
-          this.x = randomX ? Math.random() * width : (this.direction === 1 ? -60 : width + 60);
-          this.y = Math.random() * height;
+          // Made noticeably larger and count reduced to a minimal, majestic school (4 to 5 fish)
+          this.length = 75 + Math.random() * 45; 
+          this.height = this.length * 0.36;
+          this.speed = 0.5 + Math.random() * 0.6; // slow, realistic gliding
+          this.direction = Math.random() > 0.5 ? 1 : -1;
+          this.x = randomX ? Math.random() * width : (this.direction === 1 ? -150 : width + 150);
+          this.y = 100 + Math.random() * (height - 200);
           this.targetY = this.y;
           this.angle = this.direction === 1 ? 0 : Math.PI;
           this.wiggle = Math.random() * Math.PI * 2;
-          this.wiggleSpeed = 0.12 + Math.random() * 0.08;
-          this.color = Math.random() > 0.35 
-            ? { r: 45, g: 235, b: 224, a: 0.45 + Math.random() * 0.35 } // Luminous Turquoise
-            : { r: 240, g: 170, b: 60, a: 0.35 + Math.random() * 0.35 }; // Amber Gold
-          this.depthScale = 0.65 + Math.random() * 0.55;
+          this.wiggleSpeed = 0.04 + Math.random() * 0.03; // smooth, heavy motion
+          
+          // Realistic deep water creature tones (silvery scales & iridescent blue-gold)
+          this.colorType = Math.random();
         }
 
         update() {
           this.wiggle += this.wiggleSpeed;
 
-          // Wandering depth and subtle harmonic swim curve
-          if (Math.random() < 0.015) {
-            this.targetY = Math.max(80, Math.min(height - 80, this.y + (Math.random() - 0.5) * 200));
+          // Gentle wandering across vertical axis
+          if (Math.random() < 0.008) {
+            this.targetY = Math.max(120, Math.min(height - 120, this.y + (Math.random() - 0.5) * 300));
           }
-          this.y += (this.targetY - this.y) * 0.02;
+          this.y += (this.targetY - this.y) * 0.012;
 
-          // Mouse avoidance & current interaction
+          // Gentle avoidance of mouse cursor
           const dx = this.x - mouse.x;
           const dy = this.y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 140) {
-            const force = (140 - dist) / 140;
-            this.x += (dx / dist) * force * 4.5;
-            this.y += (dy / dist) * force * 4.5;
+          if (dist < 200) {
+            const force = (200 - dist) / 200;
+            this.x += (dx / dist) * force * 2.5;
+            this.y += (dy / dist) * force * 2.5;
           }
 
-          // Forward swimming
-          this.x += Math.cos(this.angle) * (this.speed * this.depthScale);
-          this.y += Math.sin(this.angle) * (this.speed * 0.4);
+          // Forward gliding motion
+          this.x += Math.cos(this.angle) * this.speed;
+          this.y += Math.sin(this.angle + this.wiggle * 0.5) * 0.3;
 
-          // Recycle when offscreen
-          if (this.direction === 1 && this.x > width + 100) this.init(false);
-          if (this.direction === -1 && this.x < -100) this.init(false);
+          // Screen wrapping / recycling
+          if (this.direction === 1 && this.x > width + 200) this.init(false);
+          if (this.direction === -1 && this.x < -200) this.init(false);
         }
 
         draw(ctx) {
           ctx.save();
           ctx.translate(this.x, this.y);
-          ctx.scale(this.depthScale, this.depthScale);
-          ctx.rotate(this.angle);
+          ctx.rotate(this.angle + Math.sin(this.wiggle) * 0.04);
 
-          const finWave = Math.sin(this.wiggle) * 4;
-          const tailWave = Math.sin(this.wiggle - 1) * 7;
+          const bodyLen = this.length;
+          const bodyH = this.height;
+          const tailSway = Math.sin(this.wiggle * 1.2) * 12;
 
-          // Body Gradient
-          const grad = ctx.createLinearGradient(-this.length * 0.6, 0, this.length * 0.6, 0);
-          grad.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.1)`);
-          grad.addColorStop(0.5, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a})`);
-          grad.addColorStop(1, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a * 0.8})`);
-
-          // Main streamlined fish body
-          ctx.fillStyle = grad;
+          // 1. Realistic Tail Fin
           ctx.beginPath();
-          ctx.moveTo(this.length * 0.5, 0); // Head tip
-          ctx.bezierCurveTo(this.length * 0.2, -this.width, -this.length * 0.3, -this.width * 0.8, -this.length * 0.5, 0);
-          ctx.bezierCurveTo(-this.length * 0.3, this.width * 0.8, this.length * 0.2, this.width, this.length * 0.5, 0);
+          ctx.moveTo(-bodyLen * 0.45, 0);
+          ctx.quadraticCurveTo(-bodyLen * 0.75, -bodyH * 1.2 + tailSway, -bodyLen * 0.9, -bodyH * 1.8 + tailSway * 1.5);
+          ctx.quadraticCurveTo(-bodyLen * 0.7, 0, -bodyLen * 0.9, bodyH * 1.8 + tailSway * 1.5);
+          ctx.quadraticCurveTo(-bodyLen * 0.75, bodyH * 1.2 + tailSway, -bodyLen * 0.45, 0);
+          ctx.fillStyle = 'rgba(30, 150, 170, 0.25)';
           ctx.fill();
 
-          // Delicate Flapping Tail Fin
-          ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a * 0.6})`;
+          // 2. Main Fish Body (Silvery iridescent gradient)
+          const bodyGrad = ctx.createLinearGradient(0, -bodyH, 0, bodyH);
+          bodyGrad.addColorStop(0, 'rgba(180, 235, 245, 0.55)');   // dorsal light reflection
+          bodyGrad.addColorStop(0.5, 'rgba(45, 235, 224, 0.35)'); // iridescent turquoise body
+          bodyGrad.addColorStop(1, 'rgba(15, 60, 90, 0.4)');     // shadowed belly
+
           ctx.beginPath();
-          ctx.moveTo(-this.length * 0.5, 0);
-          ctx.lineTo(-this.length * 0.85 + tailWave * 0.4, -this.width * 1.1 + tailWave);
-          ctx.bezierCurveTo(-this.length * 0.7, 0, -this.length * 0.7, 0, -this.length * 0.85 + tailWave * 0.4, this.width * 1.1 + tailWave);
-          ctx.closePath();
+          ctx.moveTo(bodyLen * 0.5, 0); // nose
+          ctx.bezierCurveTo(bodyLen * 0.2, -bodyH * 1.1, -bodyLen * 0.3, -bodyH * 0.9, -bodyLen * 0.45, 0);
+          ctx.bezierCurveTo(-bodyLen * 0.3, bodyH * 0.9, bodyLen * 0.2, bodyH * 1.1, bodyLen * 0.5, 0);
+          ctx.fillStyle = bodyGrad;
+          ctx.fill();
+          ctx.lineWidth = 1.2;
+          ctx.strokeStyle = 'rgba(200, 250, 255, 0.4)';
+          ctx.stroke();
+
+          // 3. Pectoral Fin (Side fin)
+          ctx.beginPath();
+          ctx.moveTo(-bodyLen * 0.05, bodyH * 0.2);
+          ctx.quadraticCurveTo(bodyLen * 0.1, bodyH * 1.4 + Math.sin(this.wiggle)*6, -bodyLen * 0.15, bodyH * 1.1);
+          ctx.fillStyle = 'rgba(45, 235, 224, 0.3)';
           ctx.fill();
 
-          // Pectoral Side Fin
-          ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a * 0.4})`;
+          // 4. Dorsal Fin (Top fin)
           ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.quadraticCurveTo(this.length * 0.1, this.width * 1.3 + finWave, -this.length * 0.2, this.width * 1.1 + finWave);
-          ctx.closePath();
+          ctx.moveTo(-bodyLen * 0.1, -bodyH * 0.85);
+          ctx.quadraticCurveTo(-bodyLen * 0.25, -bodyH * 1.6, -bodyLen * 0.4, -bodyH * 0.9);
+          ctx.fillStyle = 'rgba(30, 150, 170, 0.3)';
+          ctx.fill();
+
+          // 5. Eye
+          ctx.beginPath();
+          ctx.arc(bodyLen * 0.32, -bodyH * 0.25, bodyH * 0.12, 0, Math.PI * 2);
+          ctx.fillStyle = '#030911';
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(bodyLen * 0.33, -bodyH * 0.27, bodyH * 0.04, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
           ctx.fill();
 
           ctx.restore();
         }
       }
 
-      // Initialize School of Fishes
-      const totalFishes = Math.max(10, Math.floor(window.innerWidth / 120));
-      for (let i = 0; i < totalFishes; i++) {
-        fishes.push(new Fish());
+      // Initialize a low count of large, realistic fish (e.g., 5 majestic swimmers)
+      for (let i = 0; i < 5; i++) {
+        fishes.push(new RealisticFish());
       }
 
       // Mouse Current & Wave Trigger
@@ -1389,64 +1407,51 @@
         const dx = e.clientX - (mouse.x < 0 ? e.clientX : mouse.x);
         const dy = e.clientY - (mouse.y < 0 ? e.clientY : mouse.y);
         mouse.speed = Math.sqrt(dx * dx + dy * dy);
-        mouse.px = mouse.x;
-        mouse.py = mouse.y;
         mouse.x = e.clientX;
         mouse.y = e.clientY;
 
-        // Generate fluid water ripples along mouse trajectory
         if (mouse.speed > 2) {
           ripples.push({
             x: mouse.x,
             y: mouse.y,
-            radius: 3,
-            maxRadius: Math.min(160, 20 + mouse.speed * 2.0),
-            alpha: Math.min(0.65, 0.25 + mouse.speed * 0.015),
-            lineWidth: Math.min(4, 0.8 + mouse.speed * 0.08)
+            radius: 4,
+            maxRadius: Math.min(180, 30 + mouse.speed * 2.0),
+            alpha: 0.5,
+            lineWidth: 1.5
           });
         }
       });
 
       // Render Loop
-      function renderUnderwaterScene() {
+      function renderScene() {
         ctx.clearRect(0, 0, width, height);
 
-        // 1. Draw and animate swimming fishes
+        // Update and draw large realistic fish
         for (let i = 0; i < fishes.length; i++) {
           fishes[i].update();
           fishes[i].draw(ctx);
         }
 
-        // 2. Render dynamic water flow & ripples
-        ctx.save();
+        // Water ripples
         for (let i = ripples.length - 1; i >= 0; i--) {
           const r = ripples[i];
-          r.radius += 2.6;
-          r.alpha *= 0.945;
+          r.radius += 2.2;
+          r.alpha *= 0.95;
 
-          // Inner caustic ring
           ctx.beginPath();
           ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(45, 235, 224, ${r.alpha * 0.75})`;
+          ctx.strokeStyle = `rgba(45, 235, 224, ${r.alpha * 0.6})`;
           ctx.lineWidth = r.lineWidth;
-          ctx.stroke();
-
-          // Outer refraction ring
-          ctx.beginPath();
-          ctx.arc(r.x, r.y, r.radius * 0.78, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(0, 160, 255, ${r.alpha * 0.28})`;
-          ctx.lineWidth = r.lineWidth * 0.6;
           ctx.stroke();
 
           if (r.alpha < 0.005 || r.radius > r.maxRadius) {
             ripples.splice(i, 1);
           }
         }
-        ctx.restore();
 
-        requestAnimationFrame(renderUnderwaterScene);
+        requestAnimationFrame(renderScene);
       }
-      renderUnderwaterScene();
+      renderScene();
     })();
   </script>
 
@@ -1677,7 +1682,7 @@
 
               alert('Photograph published successfully!');
               form.reset();
-              fileNameDisplay.textContent = '';
+          fileNameDisplay.textContent = '';
             } catch (err) {
               console.error("Publishing error:", err);
               alert("Publish failed: " + err.message);
