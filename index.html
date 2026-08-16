@@ -23,7 +23,7 @@
       --border:                rgba(45, 235, 224, 0.15);
       --text-on-accent:        #0e0e0e;
       --text-display-accent:   #2debe0;
-      --surface-strong:        rgba(3, 9, 17, 0.98); /* Solid mobile menu background */
+      --surface-strong:        rgba(3, 9, 17, 0.98);
       --hero-glow:             #2debe0;
 
       --text-xs:       0.75rem;
@@ -59,7 +59,7 @@
       position: relative;
     }
 
-    /* Full-screen Water Caustics & Mouse Ripple Canvas */
+    /* Full-screen Realistic Water Caustics & Refraction Canvas */
     #water-canvas {
       position: fixed;
       top: 0;
@@ -74,6 +74,20 @@
     section {
       transform-style: preserve-3d;
       perspective: 1000px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Floating Webpage Liquid Buoyancy Simulation */
+    @keyframes pageWaterDrift {
+      0%   { transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg); }
+      33%  { transform: translate3d(0, -6px, 0) rotateX(0.2deg) rotateY(-0.3deg); }
+      66%  { transform: translate3d(0, 4px, 0) rotateX(-0.15deg) rotateY(0.2deg); }
+      100% { transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg); }
+    }
+
+    .hero-content, .about-content, .philosophy-text, .services-header, .upload-widget-card, .portfolio-grid {
+      animation: pageWaterDrift 14s ease-in-out infinite;
       position: relative;
       z-index: 2;
     }
@@ -829,7 +843,7 @@
 </head>
 <body>
 
-  <!-- Background Water Caustics & Mouse Ripple Engine Canvas -->
+  <!-- Background Realistic Water Caustics & Refraction Canvas -->
   <canvas id="water-canvas"></canvas>
 
   <!-- Navigation -->
@@ -1233,7 +1247,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-  <!-- Real Water Theme & Mouse Ripple Simulation Engine -->
+  <!-- Realistic Water Caustics & Mouse Ripple Simulation Engine -->
   <script>
     (function initWaterThemeAndRipples() {
       const canvas = document.getElementById('water-canvas');
@@ -1270,47 +1284,48 @@
         }
       });
 
-      // Generate soft caustics grid
-      const gridSize = 50;
+      // Generate soft caustics grid (smooth flowing light beams, NO circles)
+      const gridSize = 60;
       for (let x = 0; x < width + gridSize; x += gridSize) {
         for (let y = 0; y < height + gridSize; y += gridSize) {
-          caustics.push({ x, y, ox: x, oy: y, size: gridSize });
+          caustics.push({ x, y, ox: x, oy: y });
         }
       }
 
       let time = 0;
       function renderWaterTheme() {
-        time += 0.01;
+        time += 0.012;
         ctx.clearRect(0, 0, width, height);
 
-        // 1. Photorealistic Light Caustics shimmer
+        // 1. Organic, Fluid Caustic Light Streaks (No harsh shapes)
         ctx.save();
-        ctx.fillStyle = 'rgba(45, 235, 224, 0.018)';
+        ctx.strokeStyle = 'rgba(45, 235, 224, 0.035)';
+        ctx.lineWidth = 2.5;
         ctx.globalCompositeOperation = 'color-dodge';
 
         for (let i = 0; i < caustics.length; i++) {
           const c = caustics[i];
-          const pulse = Math.sin(time * 1.5 + (c.ox * 0.01) + (c.oy * 0.008));
-          c.x = c.ox + Math.sin(time + c.oy * 0.01) * 50;
-          c.y = c.oy + Math.cos(time + c.ox * 0.01) * 50;
+          const waveX = c.ox + Math.sin(time + c.oy * 0.008) * 80;
+          const waveY = c.oy + Math.cos(time + c.ox * 0.008) * 80;
 
           ctx.beginPath();
-          ctx.arc(c.x, c.y, c.size * (1 + pulse * 0.35), 0, Math.PI * 2);
-          ctx.fill();
+          ctx.moveTo(waveX, waveY);
+          ctx.lineTo(waveX + Math.sin(time * 2 + c.ox) * 40, waveY + Math.cos(time * 2 + c.oy) * 40);
+          ctx.stroke();
         }
         ctx.restore();
 
-        // 2. Deep Water Haze Gradient
+        // 2. Deep Water Immersion Haze Gradient
         const grad = ctx.createRadialGradient(
-          width * 0.5 + Math.sin(time * 0.5) * 100, 
-          height * 0.3 + Math.cos(time * 0.4) * 80, 
-          50, 
+          width * 0.5 + Math.sin(time * 0.4) * 120, 
+          height * 0.3 + Math.cos(time * 0.3) * 100, 
+          80, 
           width * 0.5, 
           height * 0.5, 
-          Math.max(width, height) * 0.85
+          Math.max(width, height) * 0.9
         );
-        grad.addColorStop(0, 'rgba(45, 235, 224, 0.03)');
-        grad.addColorStop(0.5, 'rgba(10, 30, 50, 0.06)');
+        grad.addColorStop(0, 'rgba(45, 235, 224, 0.04)');
+        grad.addColorStop(0.5, 'rgba(10, 32, 54, 0.07)');
         grad.addColorStop(1, 'rgba(3, 9, 17, 0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, width, height);
