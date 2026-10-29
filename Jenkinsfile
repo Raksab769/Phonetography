@@ -18,12 +18,12 @@ pipeline {
             }
         }
         stage('Deploy Container') {
-            steps {
-                sh 'docker stop phonetography-app || true'
-                sh 'docker rm phonetography-app || true'
-                sh 'docker run -d --name phonetography-app -p 8090:80 phonetography'
-            }
-        }
+    steps {
+        sh 'docker stop phonetography-app || true'
+        sh 'docker rm phonetography-app || true'
+        sh 'docker run -d --name phonetography-app -p 8090:80 phonetography'
+    }
+}
         stage('Health Check') {
             steps {
                 // Give the container a moment to start, then confirm it responds
