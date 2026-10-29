@@ -31,7 +31,7 @@ pipeline {
                         docker rm $CONTAINER_NAME || true
                     '''
                     // Run the new container
-                    sh 'docker run -d --name $CONTAINER_NAME -p $HOST_PORT:80 $IMAGE_NAME'
+                    sh 'docker run -d --name phonetography-app -p 8090:80 phonetography'
                 }
             }
         }
