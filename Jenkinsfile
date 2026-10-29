@@ -23,17 +23,12 @@ pipeline {
         }
 
         stage('Deploy Container') {
-            steps {
-                script {
-                    // Stop and remove any existing container with the same name
-                    sh '''
-                        docker stop $CONTAINER_NAME || true
-                        docker rm $CONTAINER_NAME || true
-                    '''
-                    // Run the new container
-                    sh 'docker run -d --name $CONTAINER_NAME -p $HOST_PORT:80 $IMAGE_NAME'
-                }
-            }
+    steps {
+        sh 'docker stop phonetography-app || true'
+        sh 'docker rm phonetography-app || true'
+        sh 'docker run -d --name phonetography-app -p 8090:80 phonetography'
+    }
+}
         }
 
         stage('Health Check') {
