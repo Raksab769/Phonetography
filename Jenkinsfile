@@ -41,7 +41,7 @@ pipeline {
                 // Give the container a moment to start, then confirm it responds
                 sh '''
                     sleep 3
-                    curl -sf http://localhost:$HOST_PORT/ > /dev/null && echo "Site is up and responding"
+                    curl -sf http://localhost:8090/ > /dev/null && echo "Site is up and responding"
                 '''
             }
         }
